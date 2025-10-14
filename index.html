@@ -141,16 +141,31 @@
                                 </div>
                             `).join('') || '<p>No sub-tasks added yet.</p>'}
                         </div>
-                        <div class="space-y-2">
-                            <input type="text" id="${safeCat}_title" placeholder="Task Title" class="w-full p-2 border rounded">
-                            <textarea id="${safeCat}_desc" rows="4" placeholder="Task Description" class="w-full p-2 border rounded"></textarea>
-                            <input type="date" id="${safeCat}_due" class="w-full p-2 border rounded">
-                            <select id="${safeCat}_priority" class="w-full p-2 border rounded">
-                                <option value="low">Low (Yellow)</option>
-                                <option value="mid">Mid (Orange)</option>
-                                <option value="high">High (Red)</option>
-                            </select>
-                            <input type="text" id="${safeCat}_assignee" placeholder="Assignee" value="Josh Mayfield" class="w-full p-2 border rounded">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Task Title</label>
+                                <input type="text" id="${safeCat}_title" placeholder="Enter task title" class="w-full p-2 border rounded mt-1">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Task Description</label>
+                                <textarea id="${safeCat}_desc" rows="4" placeholder="Enter task description" class="w-full p-2 border rounded mt-1"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Due Date</label>
+                                <input type="date" id="${safeCat}_due" class="w-full p-2 border rounded mt-1">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Priority</label>
+                                <select id="${safeCat}_priority" class="w-full p-2 border rounded mt-1">
+                                    <option value="low">Low (Yellow)</option>
+                                    <option value="mid">Mid (Orange)</option>
+                                    <option value="high">High (Red)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Assignee</label>
+                                <input type="text" id="${safeCat}_assignee" placeholder="Enter assignee name" value="Josh Mayfield" class="w-full p-2 border rounded mt-1">
+                            </div>
                             <button class="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600" onclick="addTask('${category}')">Add Task</button>
                         </div>
                     </div>
