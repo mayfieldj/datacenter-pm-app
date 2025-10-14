@@ -1,43 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -50,18 +11,20 @@
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
-    <div class="container mx-auto p-4 max-w-4xl">
+    <div class="container mx-auto p-4 max-w-4xl relative">
         <h1 class="text-3xl font-bold text-center mb-6">Data Center Project Management Tool</h1>
         
-        <!-- Navigation Tabs -->
-        <div class="flex border-b mb-4">
-            <button id="tasksTab" class="flex-1 py-2 px-4 bg-blue-500 text-white font-semibold hover:bg-blue-600 focus:outline-none">Main Tasks</button>
-            <button id="historyTab" class="flex-1 py-2 px-4 bg-gray-300 text-gray-800 font-semibold hover:bg-gray-400 focus:outline-none">Project History</button>
-        </div>
+        <!-- View Dropdown -->
+        <select id="viewSelect" class="absolute top-4 right-4 p-2 border rounded bg-white shadow">
+            <option value="main">Main Tasks</option>
+            <option value="history">Project History</option>
+            <option value="archived">Archived Tasks</option>
+            <option value="deleted">Deleted Tasks</option>
+        </select>
 
         <!-- Main Tasks Section -->
-        <div id="tasksSection" class="space-y-4">
-            <p class="text-gray-600">Click a category to expand and add sub-tasks. Tasks are saved automatically.</p>
+        <div id="mainSection" class="space-y-4">
+            <p class="text-gray-600">Click a category to expand and manage sub-tasks. Tasks are saved automatically.</p>
             <!-- Categories will be dynamically inserted here -->
         </div>
 
@@ -70,67 +33,129 @@
             <p class="text-gray-600">All tasks added, listed chronologically with timestamps.</p>
             <ul id="historyList" class="list-disc pl-5 space-y-2"></ul>
         </div>
+
+        <!-- Archived Tasks Section -->
+        <div id="archivedSection" class="hidden space-y-4">
+            <p class="text-gray-600">Archived tasks, listed with details.</p>
+            <ul id="archivedList" class="space-y-4"></ul>
+        </div>
+
+        <!-- Deleted Tasks Section -->
+        <div id="deletedSection" class="hidden space-y-4">
+            <p class="text-gray-600">Deleted tasks, listed with details (for reference).</p>
+            <ul id="deletedList" class="space-y-4"></ul>
+        </div>
     </div>
 
     <script>
-        // Predefined categories
+        // Merged and generic categories
         const categories = [
-            "Project Planning and Documentation",
-            "Budgeting and Financial Management",
-            "Procurement and Subcontractor Management",
-            "Design and Engineering Coordination",
-            "Permitting, Regulatory, and Compliance Management",
-            "Risk Management and Quality Assurance",
-            "Safety and Health Management",
-            "Team and Stakeholder Management",
-            "Scheduling and Logistics Preparation",
-            "Reporting and Performance Monitoring",
-            "Technology and Innovation Integration",
-            "Sustainability and Community Engagement"
+            "Planning & Scheduling",
+            "Financial & Reporting",
+            "Procurement & Contracts",
+            "Design & Coordination",
+            "Compliance & Permits",
+            "Risk & Quality",
+            "Safety & Health",
+            "Team & Stakeholders",
+            "Technology & Innovation",
+            "Sustainability & Community"
         ];
 
-        // Load tasks and history from localStorage or initialize
+        // Load data from localStorage or initialize
         let tasks = JSON.parse(localStorage.getItem('tasks')) || categories.reduce((acc, cat) => ({ ...acc, [cat]: [] }), {});
         let history = JSON.parse(localStorage.getItem('history')) || [];
+        let archived = JSON.parse(localStorage.getItem('archived')) || [];
+        let deleted = JSON.parse(localStorage.getItem('deleted')) || [];
 
         // Function to save data to localStorage
         function saveData() {
             localStorage.setItem('tasks', JSON.stringify(tasks));
             localStorage.setItem('history', JSON.stringify(history));
+            localStorage.setItem('archived', JSON.stringify(archived));
+            localStorage.setItem('deleted', JSON.stringify(deleted));
         }
 
         // Function to add a task
-        function addTask(category, subtask) {
-            if (subtask.trim()) {
-                tasks[category].push(subtask);
+        function addTask(category) {
+            const title = document.getElementById(`${category.replace(/\s+/g, '')}_title`).value.trim();
+            const description = document.getElementById(`${category.replace(/\s+/g, '')}_desc`).value.trim();
+            const dueDate = document.getElementById(`${category.replace(/\s+/g, '')}_due`).value;
+            const priority = document.getElementById(`${category.replace(/\s+/g, '')}_priority`).value;
+            const assignee = document.getElementById(`${category.replace(/\s+/g, '')}_assignee`).value.trim() || 'Josh Mayfield';
+
+            if (title) {
+                const task = { title, description, dueDate, priority, assignee };
+                tasks[category].push(task);
                 const timestamp = new Date().toLocaleString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                history.push(`${timestamp} - ${category}: ${subtask}`);
+                history.push(`${timestamp} - ${category}: ${title} (Assigned to ${assignee}, Due: ${dueDate || 'None'}, Priority: ${priority.toUpperCase()})`);
                 saveData();
                 renderTasks();
                 renderHistory();
             }
         }
 
+        // Function to archive a task
+        function archiveTask(category, index) {
+            const task = tasks[category].splice(index, 1)[0];
+            archived.push({ ...task, category });
+            saveData();
+            renderTasks();
+            renderArchived();
+        }
+
+        // Function to delete a task
+        function deleteTask(category, index) {
+            const task = tasks[category].splice(index, 1)[0];
+            deleted.push({ ...task, category });
+            saveData();
+            renderTasks();
+            renderDeleted();
+        }
+
         // Function to render tasks
         function renderTasks() {
-            const tasksSection = document.getElementById('tasksSection');
-            tasksSection.innerHTML = '<p class="text-gray-600">Click a category to expand and add sub-tasks. Tasks are saved automatically.</p>';
+            const mainSection = document.getElementById('mainSection');
+            mainSection.innerHTML = '<p class="text-gray-600">Click a category to expand and manage sub-tasks. Tasks are saved automatically.</p>';
             categories.forEach(category => {
                 const div = document.createElement('div');
                 div.className = 'border rounded-lg bg-white shadow';
+                const safeCat = category.replace(/\s+/g, '');
                 div.innerHTML = `
                     <button class="w-full text-left p-4 font-semibold text-lg bg-gray-50 hover:bg-gray-100">${category}</button>
                     <div class="accordion-content p-4">
-                        <ul class="list-disc pl-5 space-y-1 mb-4">
-                            ${tasks[category].length ? tasks[category].map((task, idx) => `<li>${idx + 1}. ${task}</li>`).join('') : '<li>No sub-tasks added yet.</li>'}
-                        </ul>
-                        <div class="flex space-x-2">
-                            <input type="text" placeholder="Add a sub-task" class="flex-1 p-2 border rounded" id="${category.replace(/\s+/g, '')}_input">
-                            <button class="p-2 bg-blue-500 text-white rounded hover:bg-blue-600" onclick="addTask('${category}', document.getElementById('${category.replace(/\s+/g, '')}_input').value)">Add</button>
+                        <div class="space-y-4 mb-4">
+                            ${tasks[category].map((task, idx) => `
+                                <div class="border p-3 rounded bg-gray-50">
+                                    <div class="flex justify-between items-center">
+                                        <h4 class="font-bold">${task.title}</h4>
+                                        <div>
+                                            <button class="text-blue-500 hover:underline mr-2" onclick="archiveTask('${category}', ${idx})">Archive</button>
+                                            <button class="text-red-500 hover:underline" onclick="deleteTask('${category}', ${idx})">Delete</button>
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-gray-600">Description: ${task.description || 'None'}</p>
+                                    <p class="text-sm text-gray-600">Due: ${task.dueDate || 'None'}</p>
+                                    <p class="text-sm text-gray-600">Assignee: ${task.assignee}</p>
+                                    <span class="px-2 py-1 rounded text-white text-xs" style="background-color: ${task.priority === 'low' ? '#fbbf24' : task.priority === 'mid' ? '#f97316' : '#ef4444'};">${task.priority.toUpperCase()}</span>
+                                </div>
+                            `).join('') || '<p>No sub-tasks added yet.</p>'}
+                        </div>
+                        <div class="space-y-2">
+                            <input type="text" id="${safeCat}_title" placeholder="Task Title" class="w-full p-2 border rounded">
+                            <textarea id="${safeCat}_desc" rows="4" placeholder="Task Description" class="w-full p-2 border rounded"></textarea>
+                            <input type="date" id="${safeCat}_due" class="w-full p-2 border rounded">
+                            <select id="${safeCat}_priority" class="w-full p-2 border rounded">
+                                <option value="low">Low (Yellow)</option>
+                                <option value="mid">Mid (Orange)</option>
+                                <option value="high">High (Red)</option>
+                            </select>
+                            <input type="text" id="${safeCat}_assignee" placeholder="Assignee" value="Josh Mayfield" class="w-full p-2 border rounded">
+                            <button class="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600" onclick="addTask('${category}')">Add Task</button>
                         </div>
                     </div>
                 `;
-                tasksSection.appendChild(div);
+                mainSection.appendChild(div);
             });
 
             // Add accordion functionality
@@ -147,29 +172,53 @@
         // Function to render history
         function renderHistory() {
             const historyList = document.getElementById('historyList');
-            historyList.innerHTML = history.length ? history.map(entry => `<li>${entry}</li>`).join('') : '<li>No history yet. Add tasks on the Main Tasks tab.</li>';
+            historyList.innerHTML = history.length ? history.map(entry => `<li>${entry}</li>`).join('') : '<li>No history yet. Add tasks on the Main Tasks view.</li>';
         }
 
-        // Tab navigation
-        document.getElementById('tasksTab').addEventListener('click', () => {
-            document.getElementById('tasksSection').classList.remove('hidden');
-            document.getElementById('historySection').classList.add('hidden');
-            document.getElementById('tasksTab').classList.add('bg-blue-500', 'text-white');
-            document.getElementById('historyTab').classList.remove('bg-blue-500', 'text-white');
-            document.getElementById('historyTab').classList.add('bg-gray-300', 'text-gray-800');
-        });
+        // Function to render archived
+        function renderArchived() {
+            const archivedList = document.getElementById('archivedList');
+            archivedList.innerHTML = archived.length ? archived.map(task => `
+                <li class="border p-3 rounded bg-gray-50">
+                    <h4 class="font-bold">${task.title} (${task.category})</h4>
+                    <p class="text-sm text-gray-600">Description: ${task.description || 'None'}</p>
+                    <p class="text-sm text-gray-600">Due: ${task.dueDate || 'None'}</p>
+                    <p class="text-sm text-gray-600">Assignee: ${task.assignee}</p>
+                    <span class="px-2 py-1 rounded text-white text-xs" style="background-color: ${task.priority === 'low' ? '#fbbf24' : task.priority === 'mid' ? '#f97316' : '#ef4444'};">${task.priority.toUpperCase()}</span>
+                </li>
+            `).join('') : '<li>No archived tasks yet.</li>';
+        }
 
-        document.getElementById('historyTab').addEventListener('click', () => {
-            document.getElementById('historySection').classList.remove('hidden');
-            document.getElementById('tasksSection').classList.add('hidden');
-            document.getElementById('historyTab').classList.add('bg-blue-500', 'text-white');
-            document.getElementById('tasksTab').classList.remove('bg-blue-500', 'text-white');
-            document.getElementById('tasksTab').classList.add('bg-gray-300', 'text-gray-800');
+        // Function to render deleted
+        function renderDeleted() {
+            const deletedList = document.getElementById('deletedList');
+            deletedList.innerHTML = deleted.length ? deleted.map(task => `
+                <li class="border p-3 rounded bg-gray-50">
+                    <h4 class="font-bold">${task.title} (${task.category})</h4>
+                    <p class="text-sm text-gray-600">Description: ${task.description || 'None'}</p>
+                    <p class="text-sm text-gray-600">Due: ${task.dueDate || 'None'}</p>
+                    <p class="text-sm text-gray-600">Assignee: ${task.assignee}</p>
+                    <span class="px-2 py-1 rounded text-white text-xs" style="background-color: ${task.priority === 'low' ? '#fbbf24' : task.priority === 'mid' ? '#f97316' : '#ef4444'};">${task.priority.toUpperCase()}</span>
+                </li>
+            `).join('') : '<li>No deleted tasks yet.</li>';
+        }
+
+        // View switcher
+        document.getElementById('viewSelect').addEventListener('change', (e) => {
+            const sections = ['mainSection', 'historySection', 'archivedSection', 'deletedSection'];
+            sections.forEach(sec => document.getElementById(sec).classList.add('hidden'));
+            document.getElementById(`${e.target.value}Section`).classList.remove('hidden');
         });
 
         // Initial render
         renderTasks();
         renderHistory();
+        renderArchived();
+        renderDeleted();
+
+        // Set default view to main
+        document.getElementById('viewSelect').value = 'main';
+        document.getElementById('mainSection').classList.remove('hidden');
     </script>
 </body>
 </html>
