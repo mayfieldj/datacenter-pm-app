@@ -8,6 +8,8 @@
     <style>
         .accordion-content { display: none; }
         .accordion-content.active { display: block; }
+        .modal { display: none; }
+        .modal.active { display: block; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -65,10 +67,47 @@
             <p class="text-gray-600">Deleted tasks, listed with details (for reference).</p>
             <ul id="deletedList" class="space-y-4"></ul>
         </div>
+
+        <!-- Edit Task Modal -->
+        <div id="editModal" class="modal fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+            <div class="bg-white p-6 rounded shadow-lg w-full max-w-md">
+                <h3 class="text-lg font-bold mb-4">Edit Task</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Task Title</label>
+                        <input type="text" id="editTitle" class="w-full p-2 border rounded mt-1">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Task Description</label>
+                        <textarea id="editDesc" rows="4" class="w-full p-2 border rounded mt-1"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Due Date</label>
+                        <input type="date" id="editDue" class="w-full p-2 border rounded mt-1">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Priority</label>
+                        <select id="editPriority" class="w-full p-2 border rounded mt-1">
+                            <option value="low">Low (Yellow)</option>
+                            <option value="mid">Mid (Orange)</option>
+                            <option value="high">High (Red)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Assignee</label>
+                        <input type="text" id="editAssignee" value="Josh Mayfield" class="w-full p-2 border rounded mt-1">
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="saveEditBtn" class="flex-1 p-2 bg-blue-500 text-white rounded hover:bg-blue-600">Save</button>
+                        <button id="cancelEditBtn" class="flex-1 p-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Updated categories (removed specified ones)
+        // Categories
         const categories = [
             "Planning & Scheduling",
             "Financial & Reporting",
@@ -82,7 +121,7 @@
         let history = JSON.parse(localStorage.getItem('history')) || [];
         let archived = JSON.parse(localStorage.getItem('archived')) || [];
         let deleted = JSON.parse(localStorage.getItem('deleted')) || [];
-        let assignees = JSON.parse(localStorage.getItem('assignees')) || ['Josh Mayfield', 'Clarke Hurd']; // Pre-populated with "My Tasks" as Josh and Clarke
+        let assignees = JSON.parse(localStorage.getItem('assignees')) || ['Josh Mayfield', 'Clarke Hurd'];
 
         // Function to save data to localStorage
         function saveData() {
@@ -102,12 +141,11 @@
             const assignee = document.getElementById(`${category.replace(/\s+/g, '')}_assignee`).value.trim() || 'Josh Mayfield';
 
             if (title) {
-                // Add assignee to list if not already present
                 if (!assignees.includes(assignee)) {
                     assignees.push(assignee);
                     renderAssigneeFilter();
                 }
-                const task = { title, description, dueDate, priority, assignee };
+                const task = { title, description, dueDate, priority, assignee, comments: [] };
                 tasks[category].push(task);
                 const timestamp = new Date().toLocaleString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
                 history.push(`${timestamp} - ${category}: ${title} (Assigned to ${assignee}, Due: ${dueDate || 'None'}, Priority: ${priority.toUpperCase()})`);
@@ -115,6 +153,61 @@
                 renderTasks();
                 renderHistory();
             }
+        }
+
+        // Function to add a comment
+        function addComment(category, index) {
+            const commentInput = document.getElementById(`comment_${category.replace(/\s+/g, '')}_${index}`);
+            const commentText = commentInput.value.trim();
+            if (commentText) {
+                const timestamp = new Date().toLocaleString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                tasks[category][index].comments.push({ text: commentText, timestamp });
+                history.push(`${timestamp} - ${category}: Added comment to '${tasks[category][index].title}'`);
+                commentInput.value = '';
+                saveData();
+                renderTasks();
+                renderHistory();
+            }
+        }
+
+        // Function to edit a task
+        function editTask(category, index) {
+            const task = tasks[category][index];
+            document.getElementById('editTitle').value = task.title;
+            document.getElementById('editDesc').value = task.description || '';
+            document.getElementById('editDue').value = task.dueDate || '';
+            document.getElementById('editPriority').value = task.priority;
+            document.getElementById('editAssignee').value = task.assignee;
+            document.getElementById('editModal').classList.add('active');
+
+            document.getElementById('saveEditBtn').onclick = () => {
+                const newTitle = document.getElementById('editTitle').value.trim();
+                const newDesc = document.getElementById('editDesc').value.trim();
+                const newDue = document.getElementById('editDue').value;
+                const newPriority = document.getElementById('editPriority').value;
+                const newAssignee = document.getElementById('editAssignee').value.trim() || 'Josh Mayfield';
+
+                if (newTitle) {
+                    if (!assignees.includes(newAssignee)) {
+                        assignees.push(newAssignee);
+                        renderAssigneeFilter();
+                    }
+                    tasks[category][index] = {
+                        title: newTitle,
+                        description: newDesc,
+                        dueDate: newDue,
+                        priority: newPriority,
+                        assignee: newAssignee,
+                        comments: tasks[category][index].comments
+                    };
+                    const timestamp = new Date().toLocaleString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    history.push(`${timestamp} - ${category}: Edited '${newTitle}'`);
+                    saveData();
+                    renderTasks();
+                    renderHistory();
+                    document.getElementById('editModal').classList.remove('active');
+                }
+            };
         }
 
         // Function to archive a task
@@ -182,6 +275,8 @@
                                         <div class="flex justify-between items-center">
                                             <h4 class="font-bold">${task.title}</h4>
                                             <div>
+                                                <button class="text-blue-500 hover:underline mr-2" onclick="editTask('${category}', ${idx})">Edit</button>
+                                                <button class="text-blue-500 hover:underline mr-2" onclick="document.getElementById('comment_${safeCat}_${idx}').classList.toggle('hidden')">Comment</button>
                                                 <button class="text-blue-500 hover:underline mr-2" onclick="archiveTask('${category}', ${idx})">Archive</button>
                                                 <button class="text-red-500 hover:underline" onclick="deleteTask('${category}', ${idx})">Delete</button>
                                             </div>
@@ -190,6 +285,18 @@
                                         <p class="text-sm text-gray-600">Due: ${task.dueDate || 'None'}</p>
                                         <p class="text-sm text-gray-600">Assignee: ${task.assignee}</p>
                                         <span class="px-2 py-1 rounded text-white text-xs" style="background-color: ${task.priority === 'low' ? '#fbbf24' : task.priority === 'mid' ? '#f97316' : '#ef4444'};">${task.priority.toUpperCase()}</span>
+                                        ${task.comments.length ? `
+                                            <div class="mt-2">
+                                                <p class="text-sm font-medium text-gray-700">Comments:</p>
+                                                <ul class="list-disc pl-5 text-sm text-gray-600">
+                                                    ${task.comments.map(comment => `<li>${comment.timestamp}: ${comment.text}</li>`).join('')}
+                                                </ul>
+                                            </div>
+                                        ` : ''}
+                                        <div id="comment_${safeCat}_${idx}" class="hidden mt-2">
+                                            <textarea class="w-full p-2 border rounded" placeholder="Add a comment"></textarea>
+                                            <button class="mt-1 p-2 bg-blue-500 text-white rounded hover:bg-blue-600" onclick="addComment('${category}', ${idx})">Submit Comment</button>
+                                        </div>
                                     </div>
                                 `).join('') || '<p>No sub-tasks added yet.</p>'}
                             </div>
@@ -250,6 +357,8 @@
                                 <div class="flex justify-between items-center">
                                     <h5 class="font-bold">${task.title}</h5>
                                     <div>
+                                        <button class="text-blue-500 hover:underline mr-2" onclick="editTask('${category}', ${tasks[category].indexOf(task)})">Edit</button>
+                                        <button class="text-blue-500 hover:underline mr-2" onclick="document.getElementById('comment_${category.replace(/\s+/g, '')}_${tasks[category].indexOf(task)}').classList.toggle('hidden')">Comment</button>
                                         <button class="text-blue-500 hover:underline mr-2" onclick="archiveTask('${category}', ${tasks[category].indexOf(task)})">Archive</button>
                                         <button class="text-red-500 hover:underline" onclick="deleteTask('${category}', ${tasks[category].indexOf(task)})">Delete</button>
                                     </div>
@@ -258,6 +367,18 @@
                                 <p class="text-sm text-gray-600">Due: ${task.dueDate || 'None'}</p>
                                 <p class="text-sm text-gray-600">Assignee: ${task.assignee}</p>
                                 <span class="px-2 py-1 rounded text-white text-xs" style="background-color: ${task.priority === 'low' ? '#fbbf24' : task.priority === 'mid' ? '#f97316' : '#ef4444'};">${task.priority.toUpperCase()}</span>
+                                ${task.comments.length ? `
+                                    <div class="mt-2">
+                                        <p class="text-sm font-medium text-gray-700">Comments:</p>
+                                        <ul class="list-disc pl-5 text-sm text-gray-600">
+                                            ${task.comments.map(comment => `<li>${comment.timestamp}: ${comment.text}</li>`).join('')}
+                                        </ul>
+                                    </div>
+                                ` : ''}
+                                <div id="comment_${category.replace(/\s+/g, '')}_${tasks[category].indexOf(task)}" class="hidden mt-2">
+                                    <textarea class="w-full p-2 border rounded" placeholder="Add a comment"></textarea>
+                                    <button class="mt-1 p-2 bg-blue-500 text-white rounded hover:bg-blue-600" onclick="addComment('${category}', ${tasks[category].indexOf(task)})">Submit Comment</button>
+                                </div>
                             </div>
                         `).join('');
                         catDiv.innerHTML += taskList;
@@ -286,6 +407,14 @@
                     <p class="text-sm text-gray-600">Due: ${task.dueDate || 'None'}</p>
                     <p class="text-sm text-gray-600">Assignee: ${task.assignee}</p>
                     <span class="px-2 py-1 rounded text-white text-xs" style="background-color: ${task.priority === 'low' ? '#fbbf24' : task.priority === 'mid' ? '#f97316' : '#ef4444'};">${task.priority.toUpperCase()}</span>
+                    ${task.comments.length ? `
+                        <div class="mt-2">
+                            <p class="text-sm font-medium text-gray-700">Comments:</p>
+                            <ul class="list-disc pl-5 text-sm text-gray-600">
+                                ${task.comments.map(comment => `<li>${comment.timestamp}: ${comment.text}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
                 </li>
             `).join('') : '<li>No archived tasks yet.</li>';
         }
@@ -300,9 +429,28 @@
                     <p class="text-sm text-gray-600">Due: ${task.dueDate || 'None'}</p>
                     <p class="text-sm text-gray-600">Assignee: ${task.assignee}</p>
                     <span class="px-2 py-1 rounded text-white text-xs" style="background-color: ${task.priority === 'low' ? '#fbbf24' : task.priority === 'mid' ? '#f97316' : '#ef4444'};">${task.priority.toUpperCase()}</span>
+                    ${task.comments.length ? `
+                        <div class="mt-2">
+                            <p class="text-sm font-medium text-gray-700">Comments:</p>
+                            <ul class="list-disc pl-5 text-sm text-gray-600">
+                                ${task.comments.map(comment => `<li>${comment.timestamp}: ${comment.text}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
                 </li>
             `).join('') : '<li>No deleted tasks yet.</li>';
         }
+
+        // Assignee filter listener
+        document.getElementById('assigneeFilter').addEventListener('change', renderTasks);
+
+        // Add assignee button listener
+        document.getElementById('addAssigneeBtn').addEventListener('click', addNewAssignee);
+
+        // Cancel edit button listener
+        document.getElementById('cancelEditBtn').addEventListener('click', () => {
+            document.getElementById('editModal').classList.remove('active');
+        });
 
         // View switcher
         document.getElementById('viewSelect').addEventListener('change', (e) => {
@@ -310,12 +458,6 @@
             sections.forEach(sec => document.getElementById(sec).classList.add('hidden'));
             document.getElementById(`${e.target.value}Section`).classList.remove('hidden');
         });
-
-        // Assignee filter listener
-        document.getElementById('assigneeFilter').addEventListener('change', renderTasks);
-
-        // Add assignee button listener
-        document.getElementById('addAssigneeBtn').addEventListener('click', addNewAssignee);
 
         // Initial render
         renderAssigneeFilter();
@@ -328,5 +470,7 @@
         document.getElementById('viewSelect').value = 'main';
         document.getElementById('mainSection').classList.remove('hidden');
     </script>
+</body>
+</html>
 </body>
 </html>
