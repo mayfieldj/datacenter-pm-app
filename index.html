@@ -5,22 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Center Project Management</title>
     <style>
-        /* Tailwind CSS compiled styles (subset for your app) */
-        .bg-gray-100 { background-color: #f3f4f6; }
-        .bg-white { background-color: #ffffff; }
-        .bg-gray-50 { background-color: #f9fafb; }
-        .bg-blue-500 { background-color: #3b82f6; }
-        .bg-blue-600 { background-color: #2563eb; }
-        .bg-green-500 { background-color: #10b981; }
-        .bg-green-600 { background-color: #059669; }
-        .bg-gray-300 { background-color: #d1d5db; }
-        .bg-gray-400 { background-color: #9ca3af; }
-        .text-gray-600 { color: #4b5563; }
-        .text-gray-700 { color: #374151; }
-        .text-gray-800 { color: #1f2937; }
-        .text-white { color: #ffffff; }
-        .text-blue-500 { color: #3b82f6; }
-        .text-red-500 { color: #ef4444; }
+        /* Enhanced Tailwind-like utilities for better UI */
+        :root {
+            --blue-500: #3b82f6; --blue-600: #2563eb; --green-500: #10b981; --green-600: #059669;
+            --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb; --gray-300: #d1d5db;
+            --gray-400: #9ca3af; --gray-500: #6b7280; --gray-600: #4b5563; --gray-700: #374151;
+            --gray-800: #1f2937; --red-500: #ef4444; --yellow-400: #fbbf24; --orange-500: #f97316;
+            --red-600: #dc2626;
+        }
+        .bg-gray-100 { background-color: var(--gray-100); }
+        .bg-white { background-color: #fff; }
+        .bg-gray-50 { background-color: var(--gray-50); }
+        .bg-blue-500 { background-color: var(--blue-500); }
+        .bg-blue-600 { background-color: var(--blue-600); }
+        .bg-green-500 { background-color: var(--green-500); }
+        .bg-green-600 { background-color: var(--green-600); }
+        .text-gray-600 { color: var(--gray-600); }
+        .text-gray-700 { color: var(--gray-700); }
+        .text-gray-800 { color: var(--gray-800); }
+        .text-white { color: #fff; }
+        .text-blue-500 { color: var(--blue-500); }
+        .text-red-500 { color: var(--red-500); }
         .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
         .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
         .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
@@ -31,109 +36,114 @@
         .p-2 { padding: 0.5rem; }
         .p-3 { padding: 0.75rem; }
         .p-4 { padding: 1rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
         .mt-1 { margin-top: 0.25rem; }
         .mt-2 { margin-top: 0.5rem; }
+        .mt-4 { margin-top: 1rem; }
         .mb-2 { margin-bottom: 0.5rem; }
         .mb-4 { margin-bottom: 1rem; }
         .mb-6 { margin-bottom: 1.5rem; }
         .mr-2 { margin-right: 0.5rem; }
         .space-x-2 > :not(:last-child) { margin-right: 0.5rem; }
+        .space-x-4 > :not(:last-child) { margin-right: 1rem; }
         .space-y-2 > :not(:last-child) { margin-bottom: 0.5rem; }
         .space-y-4 > :not(:last-child) { margin-bottom: 1rem; }
-        .border { border-width: 1px; border-color: #d1d5db; }
+        .border { border-width: 1px; border-color: var(--gray-300); }
+        .border-b { border-bottom-width: 1px; border-color: var(--gray-200); }
         .rounded { border-radius: 0.25rem; }
         .rounded-lg { border-radius: 0.5rem; }
-        .shadow { box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06); }
-        .shadow-lg { box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05); }
+        .shadow { box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06); }
+        .shadow-md { box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06); }
         .w-full { width: 100%; }
-        .flex-1 { flex: 1 1 0%; }
+        .min-w-80 { min-width: 20rem; }
         .flex { display: flex; }
+        .flex-wrap { flex-wrap: wrap; }
+        .flex-col { flex-direction: column; }
         .items-center { align-items: center; }
         .justify-between { justify-content: space-between; }
+        .overflow-auto { overflow: auto; }
         .text-center { text-align: center; }
         .list-disc { list-style-type: disc; }
         .pl-5 { padding-left: 1.25rem; }
         .hover\:underline:hover { text-decoration: underline; }
-        .hover\:bg-blue-600:hover { background-color: #2563eb; }
-        .hover\:bg-green-600:hover { background-color: #059669; }
-        .hover\:bg-gray-100:hover { background-color: #f3f4f6; }
-        .hover\:bg-gray-400:hover { background-color: #9ca3af; }
+        .hover\:bg-blue-600:hover { background-color: var(--blue-600); }
+        .hover\:bg-green-600:hover { background-color: var(--green-600); }
+        .hover\:bg-gray-100:hover { background-color: var(--gray-100); }
         .hidden { display: none; }
-        .accordion-content { display: none; }
-        .accordion-content.active { display: block; }
-        .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
-        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
         .text-xs { font-size: 0.75rem; line-height: 1rem; }
         .font-sans { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
         .container { width: 100%; margin-right: auto; margin-left: auto; }
         .mx-auto { margin-left: auto; margin-right: auto; }
-        .max-w-4xl { max-width: 56rem; }
-        .relative { position: relative; }
-        .absolute { position: absolute; }
-        .top-4 { top: 1rem; }
-        .right-4 { right: 1rem; }
+        .max-w-7xl { max-width: 80rem; }
+        .tabs button { padding: 0.5rem 1rem; background-color: var(--gray-50); border: 1px solid var(--gray-300); border-bottom: none; }
+        .tabs button.active { background-color: white; font-weight: bold; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
-    <div class="container mx-auto p-4 max-w-4xl relative">
+    <div class="container mx-auto p-4 max-w-7xl">
         <h1 class="text-3xl font-bold text-center mb-6">Data Center Project Management Tool</h1>
-        
-        <!-- View Dropdown -->
-        <select id="viewSelect" class="absolute top-4 right-4 p-2 border rounded bg-white shadow">
-            <option value="main">Main Tasks</option>
-            <option value="history">Project History</option>
-            <option value="archived">Archived Tasks</option>
-            <option value="deleted">Deleted Tasks</option>
-        </select>
 
-        <!-- Main Tasks Section -->
-        <div id="mainSection" class="space-y-4">
-            <p class="text-gray-600">Click a category to expand and manage sub-tasks. Tasks are saved automatically.</p>
-            
+        <!-- View Tabs -->
+        <div class="tabs flex space-x-2 mb-4">
+            <button data-view="main" class="rounded-t-lg hover:bg-gray-100 active">Main Tasks</button>
+            <button data-view="history" class="rounded-t-lg hover:bg-gray-100">Project History</button>
+            <button data-view="archived" class="rounded-t-lg hover:bg-gray-100">Archived Tasks</button>
+            <button data-view="deleted" class="rounded-t-lg hover:bg-gray-100">Deleted Tasks</button>
+        </div>
+
+        <!-- Main Section -->
+        <section id="mainSection" class="space-y-4">
+            <p class="text-gray-600 text-sm">Manage tasks across categories in a Kanban-style board. Drag cards between columns if needed (future feature). Changes save automatically.</p>
+
             <!-- Assignee Filter -->
-            <div class="bg-white p-4 border rounded shadow">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Filter by Assignee</label>
-                <select id="assigneeFilter" class="w-full p-2 border rounded mb-2">
-                    <option value="all">All Tasks</option>
-                    <!-- Dynamic options will be added here -->
-                </select>
-                <div class="flex space-x-2 mt-2">
-                    <input type="text" id="newAssignee" placeholder="Add new assignee (e.g., John Doe)" class="flex-1 p-2 border rounded">
-                    <button id="addAssigneeBtn" class="p-2 bg-green-500 text-white rounded hover:bg-green-600">Add</button>
+            <div class="bg-white p-4 border rounded shadow-md flex items-center space-x-4">
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Filter by Assignee</label>
+                    <select id="assigneeFilter" class="w-full p-2 border rounded"></select>
+                </div>
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Add Assignee</label>
+                    <div class="flex">
+                        <input type="text" id="newAssignee" placeholder="e.g., John Doe" class="flex-1 p-2 border rounded-l">
+                        <button id="addAssigneeBtn" class="p-2 bg-green-500 text-white rounded-r hover:bg-green-600">Add</button>
+                    </div>
                 </div>
             </div>
-            
-            <!-- Filtered Tasks Display (hidden by default) -->
-            <div id="filteredTasks" class="hidden space-y-4"></div>
-            
-            <!-- Categories (shown when no filter) -->
-            <div id="categoriesContainer" class="space-y-4">
-                <!-- Categories will be dynamically inserted here -->
+
+            <!-- Kanban Board (for all assignees) -->
+            <div id="kanbanBoard" class="flex overflow-auto space-x-4 pb-4">
+                <!-- Columns dynamically added here -->
             </div>
-        </div>
 
-        <!-- Project History Section -->
-        <div id="historySection" class="hidden space-y-4">
-            <p class="text-gray-600">All tasks added, listed chronologically with timestamps.</p>
-            <ul id="historyList" class="list-disc pl-5 space-y-2"></ul>
-        </div>
+            <!-- Filtered View (single column) -->
+            <div id="filteredView" class="hidden space-y-4">
+                <!-- Filtered tasks grouped by category -->
+            </div>
+        </section>
 
-        <!-- Archived Tasks Section -->
-        <div id="archivedSection" class="hidden space-y-4">
-            <p class="text-gray-600">Archived tasks, listed with details.</p>
-            <ul id="archivedList" class="space-y-4"></ul>
-        </div>
+        <!-- History Section -->
+        <section id="historySection" class="hidden space-y-4">
+            <p class="text-gray-600 text-sm">Chronological log of actions.</p>
+            <ul id="historyList" class="space-y-2 border rounded bg-white p-4 shadow-md"></ul>
+        </section>
 
-        <!-- Deleted Tasks Section -->
-        <div id="deletedSection" class="hidden space-y-4">
-            <p class="text-gray-600">Deleted tasks, listed with details (for reference).</p>
-            <ul id="deletedList" class="space-y-4"></ul>
-        </div>
+        <!-- Archived Section -->
+        <section id="archivedSection" class="hidden space-y-4">
+            <p class="text-gray-600 text-sm">Archived tasks for reference.</p>
+            <ul id="archivedList" class="space-y-4 border rounded bg-white p-4 shadow-md"></ul>
+        </section>
+
+        <!-- Deleted Section -->
+        <section id="deletedSection" class="hidden space-y-4">
+            <p class="text-gray-600 text-sm">Deleted tasks for reference.</p>
+            <ul id="deletedList" class="space-y-4 border rounded bg-white p-4 shadow-md"></ul>
+        </section>
     </div>
 
     <script>
-        // Categories
-        const categories = [
+        // Data
+        const CATEGORIES = [
             "Planning & Scheduling",
             "Financial & Reporting",
             "Procurement & Contracts",
@@ -141,314 +151,246 @@
             "Compliance & Permits"
         ];
 
-        // Load data from localStorage or initialize
-        let tasks = JSON.parse(localStorage.getItem('tasks')) || categories.reduce((acc, cat) => ({ ...acc, [cat]: [] }), {});
-        let history = JSON.parse(localStorage.getItem('history')) || [];
-        let archived = JSON.parse(localStorage.getItem('archived')) || [];
-        let deleted = JSON.parse(localStorage.getItem('deleted')) || [];
-        let assignees = JSON.parse(localStorage.getItem('assignees')) || ['Josh Mayfield', 'Clarke Hurd'];
+        let tasks = JSON.parse(localStorage.getItem('dcpm_tasks')) || CATEGORIES.reduce((o, c) => (o[c] = [], o), {});
+        let history = JSON.parse(localStorage.getItem('dcpm_history')) || [];
+        let archived = JSON.parse(localStorage.getItem('dcpm_archived')) || [];
+        let deleted = JSON.parse(localStorage.getItem('dcpm_deleted')) || [];
+        let assignees = JSON.parse(localStorage.getItem('dcpm_assignees')) || ['Josh Mayfield', 'Clarke Hurd'];
 
-        // Function to save data to localStorage
-        function saveData() {
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-            localStorage.setItem('history', JSON.stringify(history));
-            localStorage.setItem('archived', JSON.stringify(archived));
-            localStorage.setItem('deleted', JSON.stringify(deleted));
-            localStorage.setItem('assignees', JSON.stringify(assignees));
+        function persist() {
+            localStorage.setItem('dcpm_tasks', JSON.stringify(tasks));
+            localStorage.setItem('dcpm_history', JSON.stringify(history));
+            localStorage.setItem('dcpm_archived', JSON.stringify(archived));
+            localStorage.setItem('dcpm_deleted', JSON.stringify(deleted));
+            localStorage.setItem('dcpm_assignees', JSON.stringify(assignees));
         }
 
-        // Function to add a task
-        function addTask(category) {
-            const title = document.getElementById(`${category.replace(/\s+/g, '')}_title`).value.trim();
-            const description = document.getElementById(`${category.replace(/\s+/g, '')}_desc`).value.trim();
-            const dueDate = document.getElementById(`${category.replace(/\s+/g, '')}_due`).value;
-            const priority = document.getElementById(`${category.replace(/\s+/g, '')}_priority`).value;
-            const assignee = document.getElementById(`${category.replace(/\s+/g, '')}_assignee`).value.trim() || 'Josh Mayfield';
+        // Helpers
+        const esc = str => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+        const ts = () => new Date().toLocaleString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const priColor = p => p === 'low' ? '#fbbf24' : p === 'mid' ? '#f97316' : '#ef4444';
 
-            if (title) {
-                if (!assignees.includes(assignee)) {
-                    assignees.push(assignee);
-                    renderAssigneeFilter();
-                }
-                const task = { title, description, dueDate, priority, assignee, comments: [] };
-                tasks[category].push(task);
-                const timestamp = new Date().toLocaleString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                history.push(`${timestamp} - ${category}: ${title} (Assigned to ${assignee}, Due: ${dueDate || 'None'}, Priority: ${priority.toUpperCase()})`);
-                saveData();
-                renderTasks();
-                renderHistory();
-            }
+        // Render Functions
+        function renderAssignees() {
+            const sel = document.getElementById('assigneeFilter');
+            sel.innerHTML = '<option value="all">All Assignees</option>' + assignees.map(a => `<option value="${esc(a)}">${esc(a === 'Josh Mayfield' ? 'My Tasks (Josh Mayfield)' : a)}</option>`).join('');
         }
 
-        // Function to add a comment
-        function addComment(category, index) {
-            const commentInput = document.getElementById(`comment_${category.replace(/\s+/g, '')}_${index}`);
-            const commentText = commentInput.value.trim();
-            if (commentText) {
-                const timestamp = new Date().toLocaleString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                tasks[category][index].comments.push({ text: commentText, timestamp });
-                history.push(`${timestamp} - ${category}: Added comment to '${tasks[category][index].title}'`);
-                commentInput.value = '';
-                saveData();
-                renderTasks();
-                renderHistory();
-            }
-        }
-
-        // Function to archive a task
-        function archiveTask(category, index) {
-            const task = tasks[category].splice(index, 1)[0];
-            archived.push({ ...task, category });
-            saveData();
-            renderTasks();
-            renderArchived();
-        }
-
-        // Function to delete a task
-        function deleteTask(category, index) {
-            const task = tasks[category].splice(index, 1)[0];
-            deleted.push({ ...task, category });
-            saveData();
-            renderTasks();
-            renderDeleted();
-        }
-
-        // Function to render assignee filter options
-        function renderAssigneeFilter() {
-            const filterSelect = document.getElementById('assigneeFilter');
-            filterSelect.innerHTML = '<option value="all">All Tasks</option>';
-            assignees.forEach(assignee => {
-                const option = document.createElement('option');
-                option.value = assignee;
-                option.textContent = assignee === 'Josh Mayfield' ? 'My Tasks (Josh Mayfield)' : `${assignee} Tasks`;
-                filterSelect.appendChild(option);
+        function renderKanban() {
+            const board = document.getElementById('kanbanBoard');
+            board.innerHTML = '';
+            CATEGORIES.forEach(cat => {
+                const col = document.createElement('div');
+                col.className = 'min-w-80 flex-col bg-white rounded-lg shadow-md p-4 space-y-2';
+                col.innerHTML = `
+                    <h3 class="text-lg font-semibold mb-2">${esc(cat)}</h3>
+                    <div class="space-y-2 flex-1" id="tasks_${cat.replace(/\s+/g, '')}"></div>
+                    <div class="border-t pt-2 space-y-2">
+                        <input type="text" data-id="title" placeholder="Task title" class="w-full p-2 border rounded">
+                        <textarea data-id="desc" rows="2" placeholder="Description (optional)" class="w-full p-2 border rounded"></textarea>
+                        <input type="date" data-id="due" class="w-full p-2 border rounded">
+                        <select data-id="pri" class="w-full p-2 border rounded">
+                            <option value="low">Low</option>
+                            <option value="mid">Mid</option>
+                            <option value="high">High</option>
+                        </select>
+                        <input type="text" data-id="assignee" value="Josh Mayfield" placeholder="Assignee" class="w-full p-2 border rounded">
+                        <button data-action="addTask" data-cat="${esc(cat)}" class="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600">Add Task</button>
+                    </div>`;
+                board.appendChild(col);
+                renderCategoryTasks(cat);
             });
-            saveData();
         }
 
-        // Function to add new assignee
-        function addNewAssignee() {
-            const newAssigneeInput = document.getElementById('newAssignee');
-            const newName = newAssigneeInput.value.trim();
-            if (newName && !assignees.includes(newName)) {
-                assignees.push(newName);
-                renderAssigneeFilter();
-                newAssigneeInput.value = '';
-            }
+        function renderCategoryTasks(cat) {
+            const container = document.querySelector(`#tasks_${cat.replace(/\s+/g, '')}`);
+            if (!container) return;
+            container.innerHTML = tasks[cat].map((t, i) => taskCard(cat, t, i)).join('') || '<p class="text-sm text-gray-500">No tasks yet.</p>';
         }
 
-        // Function to render tasks (with filter)
-        function renderTasks() {
-            const categoriesContainer = document.getElementById('categoriesContainer');
-            const filteredTasksDiv = document.getElementById('filteredTasks');
-            const selectedAssignee = document.getElementById('assigneeFilter').value;
+        function taskCard(cat, t, i) {
+            const safeId = `${cat.replace(/\s+/g, '')}_${i}`;
+            return `
+                <div class="border rounded p-3 bg-gray-50 space-y-1 shadow">
+                    <div class="flex justify-between items-start">
+                        <h4 class="font-bold text-sm">${esc(t.title)}</h4>
+                        <span class="px-2 py-1 rounded text-white text-xs" style="background:${priColor(t.priority)}">${t.priority.toUpperCase()}</span>
+                    </div>
+                    <p class="text-sm text-gray-600">${esc(t.description || 'No description')}</p>
+                    <p class="text-xs text-gray-500">Due: ${t.dueDate || 'None'}</p>
+                    <p class="text-xs text-gray-500">Assignee: ${esc(t.assignee)}</p>
+                    ${t.comments.length ? `<p class="text-xs text-gray-500">Comments: ${t.comments.length}</p>` : ''}
+                    <div class="flex space-x-2 mt-2">
+                        <button data-action="toggleComment" data-id="${safeId}" class="text-xs text-blue-500 hover:underline">Comment</button>
+                        <button data-action="archive" data-cat="${esc(cat)}" data-idx="${i}" class="text-xs text-blue-500 hover:underline">Archive</button>
+                        <button data-action="delete" data-cat="${esc(cat)}" data-idx="${i}" class="text-xs text-red-500 hover:underline">Delete</button>
+                    </div>
+                    <div id="comment_${safeId}" class="hidden mt-2 space-y-1">
+                        ${t.comments.map(c => `<p class="text-xs text-gray-600 border-b py-1">${esc(c.timestamp)}: ${esc(c.text)}</p>`).join('')}
+                        <textarea placeholder="Add comment" class="w-full p-2 border rounded text-sm"></textarea>
+                        <button data-action="addComment" data-cat="${esc(cat)}" data-idx="${i}" class="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">Submit</button>
+                    </div>
+                </div>`;
+        }
 
-            if (selectedAssignee === 'all') {
-                categoriesContainer.classList.remove('hidden');
-                filteredTasksDiv.classList.add('hidden');
-                categoriesContainer.innerHTML = '';
-                categories.forEach(category => {
-                    const div = document.createElement('div');
-                    div.className = 'border rounded-lg bg-white shadow';
-                    const safeCat = category.replace(/\s+/g, '');
-                    div.innerHTML = `
-                        <button class="w-full text-left p-4 font-semibold text-lg bg-gray-50 hover:bg-gray-100">${category}</button>
-                        <div class="accordion-content p-4">
-                            <div class="space-y-4 mb-4">
-                                ${tasks[category].map((task, idx) => `
-                                    <div class="border p-3 rounded bg-gray-50">
-                                        <div class="flex justify-between items-center">
-                                            <h4 class="font-bold">${task.title}</h4>
-                                            <div>
-                                                <button class="text-blue-500 hover:underline mr-2" onclick="document.getElementById('comment_${safeCat}_${idx}').classList.toggle('hidden')">Comment</button>
-                                                <button class="text-blue-500 hover:underline mr-2" onclick="archiveTask('${category}', ${idx})">Archive</button>
-                                                <button class="text-red-500 hover:underline" onclick="deleteTask('${category}', ${idx})">Delete</button>
-                                            </div>
-                                        </div>
-                                        <p class="text-sm text-gray-600">Description: ${task.description || 'None'}</p>
-                                        <p class="text-sm text-gray-600">Due: ${task.dueDate || 'None'}</p>
-                                        <p class="text-sm text-gray-600">Assignee: ${task.assignee}</p>
-                                        <span class="px-2 py-1 rounded text-white text-xs" style="background-color: ${task.priority === 'low' ? '#fbbf24' : task.priority === 'mid' ? '#f97316' : '#ef4444'};">${task.priority.toUpperCase()}</span>
-                                        ${task.comments.length ? `
-                                            <div class="mt-2">
-                                                <p class="text-sm font-medium text-gray-700">Comments:</p>
-                                                <ul class="list-disc pl-5 text-sm text-gray-600">
-                                                    ${task.comments.map(comment => `<li>${comment.timestamp}: ${comment.text}</li>`).join('')}
-                                                </ul>
-                                            </div>
-                                        ` : ''}
-                                        <div id="comment_${safeCat}_${idx}" class="hidden mt-2">
-                                            <textarea class="w-full p-2 border rounded" placeholder="Add a comment"></textarea>
-                                            <button class="mt-1 p-2 bg-blue-500 text-white rounded hover:bg-blue-600" onclick="addComment('${category}', ${idx})">Submit Comment</button>
-                                        </div>
-                                    </div>
-                                `).join('') || '<p>No sub-tasks added yet.</p>'}
-                            </div>
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Task Title</label>
-                                    <input type="text" id="${safeCat}_title" placeholder="Enter task title" class="w-full p-2 border rounded mt-1">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Task Description</label>
-                                    <textarea id="${safeCat}_desc" rows="4" placeholder="Enter task description" class="w-full p-2 border rounded mt-1"></textarea>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Due Date</label>
-                                    <input type="date" id="${safeCat}_due" class="w-full p-2 border rounded mt-1">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Priority</label>
-                                    <select id="${safeCat}_priority" class="w-full p-2 border rounded mt-1">
-                                        <option value="low">Low (Yellow)</option>
-                                        <option value="mid">Mid (Orange)</option>
-                                        <option value="high">High (Red)</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Assignee</label>
-                                    <input type="text" id="${safeCat}_assignee" placeholder="Enter assignee name" value="Josh Mayfield" class="w-full p-2 border rounded mt-1">
-                                </div>
-                                <button class="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600" onclick="addTask('${category}')">Add Task</button>
-                            </div>
-                        </div>
-                    `;
-                    categoriesContainer.appendChild(div);
-                });
-
-                // Add accordion functionality
-                document.querySelectorAll('.border button').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const content = btn.nextElementSibling;
-                        const isActive = content.classList.contains('active');
-                        document.querySelectorAll('.accordion-content').forEach(c => c.classList.remove('active'));
-                        if (!isActive) content.classList.add('active');
-                    });
-                });
-            } else {
-                categoriesContainer.classList.add('hidden');
-                filteredTasksDiv.classList.remove('hidden');
-                filteredTasksDiv.innerHTML = `<h3 class="text-xl font-bold mb-4">Tasks for ${selectedAssignee}</h3>`;
-                let hasTasks = false;
-                categories.forEach(category => {
-                    const filtered = tasks[category].filter(task => task.assignee === selectedAssignee);
-                    if (filtered.length > 0) {
-                        hasTasks = true;
-                        const catDiv = document.createElement('div');
-                        catDiv.innerHTML = `<h4 class="font-semibold text-lg mb-2">${category}</h4>`;
-                        const taskList = filtered.map((task, idx) => `
-                            <div class="border p-3 rounded bg-gray-50 mb-2">
-                                <div class="flex justify-between items-center">
-                                    <h5 class="font-bold">${task.title}</h5>
-                                    <div>
-                                        <button class="text-blue-500 hover:underline mr-2" onclick="document.getElementById('comment_${category.replace(/\s+/g, '')}_${tasks[category].indexOf(task)}').classList.toggle('hidden')">Comment</button>
-                                        <button class="text-blue-500 hover:underline mr-2" onclick="archiveTask('${category}', ${tasks[category].indexOf(task)})">Archive</button>
-                                        <button class="text-red-500 hover:underline" onclick="deleteTask('${category}', ${tasks[category].indexOf(task)})">Delete</button>
-                                    </div>
-                                </div>
-                                <p class="text-sm text-gray-600">Description: ${task.description || 'None'}</p>
-                                <p class="text-sm text-gray-600">Due: ${task.dueDate || 'None'}</p>
-                                <p class="text-sm text-gray-600">Assignee: ${task.assignee}</p>
-                                <span class="px-2 py-1 rounded text-white text-xs" style="background-color: ${task.priority === 'low' ? '#fbbf24' : task.priority === 'mid' ? '#f97316' : '#ef4444'};">${task.priority.toUpperCase()}</span>
-                                ${task.comments.length ? `
-                                    <div class="mt-2">
-                                        <p class="text-sm font-medium text-gray-700">Comments:</p>
-                                        <ul class="list-disc pl-5 text-sm text-gray-600">
-                                            ${task.comments.map(comment => `<li>${comment.timestamp}: ${comment.text}</li>`).join('')}
-                                        </ul>
-                                    </div>
-                                ` : ''}
-                                <div id="comment_${category.replace(/\s+/g, '')}_${tasks[category].indexOf(task)}" class="hidden mt-2">
-                                    <textarea class="w-full p-2 border rounded" placeholder="Add a comment"></textarea>
-                                    <button class="mt-1 p-2 bg-blue-500 text-white rounded hover:bg-blue-600" onclick="addComment('${category}', ${tasks[category].indexOf(task)})">Submit Comment</button>
-                                </div>
-                            </div>
-                        `).join('');
-                        catDiv.innerHTML += taskList;
-                        filteredTasksDiv.appendChild(catDiv);
-                    }
-                });
-                if (!hasTasks) {
-                    filteredTasksDiv.innerHTML += '<p>No tasks for this assignee.</p>';
+        function renderFiltered() {
+            const assignee = document.getElementById('assigneeFilter').value;
+            const fv = document.getElementById('filteredView');
+            fv.innerHTML = `<h3 class="text-xl font-bold mb-4">Tasks for ${esc(assignee)}</h3>`;
+            let hasTasks = false;
+            CATEGORIES.forEach(cat => {
+                const ft = tasks[cat].filter(t => t.assignee === assignee);
+                if (ft.length) {
+                    hasTasks = true;
+                    fv.innerHTML += `<h4 class="font-semibold text-lg mb-2">${esc(cat)}</h4>` + ft.map((t, _) => {
+                        const i = tasks[cat].findIndex(task => task === t); // Correct index
+                        return taskCard(cat, t, i);
+                    }).join('');
                 }
-            }
+            });
+            if (!hasTasks) fv.innerHTML += '<p class="text-gray-600">No tasks for this assignee.</p>';
         }
 
-        // Function to render history
         function renderHistory() {
-            const historyList = document.getElementById('historyList');
-            historyList.innerHTML = history.length ? history.map(entry => `<li>${entry}</li>`).join('') : '<li>No history yet. Add tasks on the Main Tasks view.</li>';
+            document.getElementById('historyList').innerHTML = history.map(e => `<li class="text-sm text-gray-600 border-b py-2">${esc(e)}</li>`).join('') || '<li class="text-sm text-gray-600">No history yet.</li>';
         }
 
-        // Function to render archived
         function renderArchived() {
-            const archivedList = document.getElementById('archivedList');
-            archivedList.innerHTML = archived.length ? archived.map(task => `
-                <li class="border p-3 rounded bg-gray-50">
-                    <h4 class="font-bold">${task.title} (${task.category})</h4>
-                    <p class="text-sm text-gray-600">Description: ${task.description || 'None'}</p>
-                    <p class="text-sm text-gray-600">Due: ${task.dueDate || 'None'}</p>
-                    <p class="text-sm text-gray-600">Assignee: ${task.assignee}</p>
-                    <span class="px-2 py-1 rounded text-white text-xs" style="background-color: ${task.priority === 'low' ? '#fbbf24' : task.priority === 'mid' ? '#f97316' : '#ef4444'};">${task.priority.toUpperCase()}</span>
-                    ${task.comments.length ? `
-                        <div class="mt-2">
-                            <p class="text-sm font-medium text-gray-700">Comments:</p>
-                            <ul class="list-disc pl-5 text-sm text-gray-600">
-                                ${task.comments.map(comment => `<li>${comment.timestamp}: ${comment.text}</li>`).join('')}
-                            </ul>
-                        </div>
-                    ` : ''}
-                </li>
-            `).join('') : '<li>No archived tasks yet.</li>';
+            document.getElementById('archivedList').innerHTML = archived.map(t => listItem(t)).join('') || '<p class="text-sm text-gray-600">No archived tasks.</p>';
         }
 
-        // Function to render deleted
         function renderDeleted() {
-            const deletedList = document.getElementById('deletedList');
-            deletedList.innerHTML = deleted.length ? deleted.map(task => `
-                <li class="border p-3 rounded bg-gray-50">
-                    <h4 class="font-bold">${task.title} (${task.category})</h4>
-                    <p class="text-sm text-gray-600">Description: ${task.description || 'None'}</p>
-                    <p class="text-sm text-gray-600">Due: ${task.dueDate || 'None'}</p>
-                    <p class="text-sm text-gray-600">Assignee: ${task.assignee}</p>
-                    <span class="px-2 py-1 rounded text-white text-xs" style="background-color: ${task.priority === 'low' ? '#fbbf24' : task.priority === 'mid' ? '#f97316' : '#ef4444'};">${task.priority.toUpperCase()}</span>
-                    ${task.comments.length ? `
-                        <div class="mt-2">
-                            <p class="text-sm font-medium text-gray-700">Comments:</p>
-                            <ul class="list-disc pl-5 text-sm text-gray-600">
-                                ${task.comments.map(comment => `<li>${comment.timestamp}: ${comment.text}</li>`).join('')}
-                            </ul>
-                        </div>
-                    ` : ''}
-                </li>
-            `).join('') : '<li>No deleted tasks yet.</li>';
+            document.getElementById('deletedList').innerHTML = deleted.map(t => listItem(t)).join('') || '<p class="text-sm text-gray-600">No deleted tasks.</p>';
         }
 
-        // Assignee filter listener
-        document.getElementById('assigneeFilter').addEventListener('change', renderTasks);
+        function listItem(t) {
+            return `
+                <li class="border rounded p-3 bg-gray-50 space-y-1 shadow">
+                    <div class="flex justify-between">
+                        <h4 class="font-bold text-sm">${esc(t.title)} <span class="text-gray-500">(${esc(t.category)})</span></h4>
+                        <span class="px-2 py-1 rounded text-white text-xs" style="background:${priColor(t.priority)}">${t.priority.toUpperCase()}</span>
+                    </div>
+                    <p class="text-sm text-gray-600">${esc(t.description || 'No description')}</p>
+                    <p class="text-xs text-gray-500">Due: ${t.dueDate || 'None'}</p>
+                    <p class="text-xs text-gray-500">Assignee: ${esc(t.assignee)}</p>
+                    ${t.comments.length ? t.comments.map(c => `<p class="text-xs text-gray-600 border-t pt-1">${esc(c.timestamp)}: ${esc(c.text)}</p>`).join('') : ''}
+                </li>`;
+        }
 
-        // Add assignee button listener
-        document.getElementById('addAssigneeBtn').addEventListener('click', addNewAssignee);
+        // Actions
+        function addTask(cat, form) {
+            const title = form.querySelector('[data-id="title"]').value.trim();
+            if (!title) return alert('Title required.');
+            const desc = form.querySelector('[data-id="desc"]').value.trim();
+            const due = form.querySelector('[data-id="due"]').value;
+            const pri = form.querySelector('[data-id="pri"]').value;
+            const asn = form.querySelector('[data-id="assignee"]').value.trim() || 'Josh Mayfield';
+            if (!assignees.includes(asn)) {
+                assignees.push(asn);
+                renderAssignees();
+            }
+            const task = { title, description: desc, dueDate: due, priority: pri, assignee: asn, comments: [] };
+            tasks[cat].push(task);
+            history.push(`${ts()} - Added: ${title} in ${cat} (Assignee: ${asn}, Due: ${due || 'None'}, Pri: ${pri.toUpperCase()})`);
+            persist();
+            form.querySelectorAll('input, textarea').forEach(el => el.value = el.type === 'date' ? '' : el.dataset.id === 'assignee' ? 'Josh Mayfield' : '');
+            form.querySelector('[data-id="pri"]').value = 'low';
+            updateMainView();
+            renderHistory();
+        }
 
-        // View switcher
-        document.getElementById('viewSelect').addEventListener('change', (e) => {
-            const sections = ['mainSection', 'historySection', 'archivedSection', 'deletedSection'];
-            sections.forEach(sec => document.getElementById(sec).classList.add('hidden'));
-            document.getElementById(`${e.target.value}Section`).classList.remove('hidden');
+        function addComment(cat, idx, txtEl) {
+            const txt = txtEl.value.trim();
+            if (!txt) return;
+            const time = ts();
+            tasks[cat][idx].comments.push({ text: txt, timestamp: time });
+            history.push(`${time} - Comment on "${tasks[cat][idx].title}" in ${cat}`);
+            txtEl.value = '';
+            persist();
+            updateMainView();
+            renderHistory();
+        }
+
+        function archive(cat, idx) {
+            const t = tasks[cat].splice(idx, 1)[0];
+            archived.push({ ...t, category: cat });
+            history.push(`${ts()} - Archived: ${t.title} from ${cat}`);
+            persist();
+            updateMainView();
+            renderArchived();
+            renderHistory();
+        }
+
+        function del(cat, idx) {
+            const t = tasks[cat].splice(idx, 1)[0];
+            deleted.push({ ...t, category: cat });
+            history.push(`${ts()} - Deleted: ${t.title} from ${cat}`);
+            persist();
+            updateMainView();
+            renderDeleted();
+            renderHistory();
+        }
+
+        function updateMainView() {
+            const sel = document.getElementById('assigneeFilter').value;
+            document.getElementById('kanbanBoard').classList.toggle('hidden', sel !== 'all');
+            document.getElementById('filteredView').classList.toggle('hidden', sel === 'all');
+            if (sel === 'all') renderKanban();
+            else renderFiltered();
+        }
+
+        // Event Delegation
+        document.addEventListener('click', e => {
+            const btn = e.target;
+            const act = btn.dataset.action;
+            if (!act) return;
+
+            if (act === 'addTask') {
+                const form = btn.closest('.space-y-2');
+                addTask(btn.dataset.cat, form);
+            } else if (act === 'addComment') {
+                const txt = btn.previousElementSibling;
+                addComment(btn.dataset.cat, +btn.dataset.idx, txt);
+            } else if (act === 'archive') archive(btn.dataset.cat, +btn.dataset.idx);
+            else if (act === 'delete') del(btn.dataset.cat, +btn.dataset.idx);
+            else if (act === 'toggleComment') {
+                const id = btn.dataset.id;
+                document.getElementById(`comment_${id}`).classList.toggle('hidden');
+            }
         });
 
-        // Initial render
-        renderAssigneeFilter();
-        renderTasks();
+        // Tabs
+        document.querySelector('.tabs').addEventListener('click', e => {
+            if (e.target.tagName !== 'BUTTON') return;
+            document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            ['mainSection', 'historySection', 'archivedSection', 'deletedSection'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById(`${e.target.dataset.view}Section`).classList.remove('hidden');
+        });
+
+        // Assignee Filter Change
+        document.getElementById('assigneeFilter').addEventListener('change', updateMainView);
+
+        // Add Assignee
+        document.getElementById('addAssigneeBtn').addEventListener('click', () => {
+            const val = document.getElementById('newAssignee').value.trim();
+            if (val && !assignees.includes(val)) {
+                assignees.push(val);
+                persist();
+                renderAssignees();
+                document.getElementById('newAssignee').value = '';
+            }
+        });
+
+        // Init
+        renderAssignees();
+        updateMainView();
         renderHistory();
         renderArchived();
         renderDeleted();
-
-        // Set default view to main
-        document.getElementById('viewSelect').value = 'main';
+        document.querySelector('[data-view="main"]').classList.add('active');
         document.getElementById('mainSection').classList.remove('hidden');
     </script>
 </body>
 </html>
-</body>
 </html>
