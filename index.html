@@ -1,396 +1,233 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Center Project Management</title>
-    <style>
-        /* Enhanced Tailwind-like utilities for better UI */
-        :root {
-            --blue-500: #3b82f6; --blue-600: #2563eb; --green-500: #10b981; --green-600: #059669;
-            --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb; --gray-300: #d1d5db;
-            --gray-400: #9ca3af; --gray-500: #6b7280; --gray-600: #4b5563; --gray-700: #374151;
-            --gray-800: #1f2937; --red-500: #ef4444; --yellow-400: #fbbf24; --orange-500: #f97316;
-            --red-600: #dc2626;
-        }
-        .bg-gray-100 { background-color: var(--gray-100); }
-        .bg-white { background-color: #fff; }
-        .bg-gray-50 { background-color: var(--gray-50); }
-        .bg-blue-500 { background-color: var(--blue-500); }
-        .bg-blue-600 { background-color: var(--blue-600); }
-        .bg-green-500 { background-color: var(--green-500); }
-        .bg-green-600 { background-color: var(--green-600); }
-        .text-gray-600 { color: var(--gray-600); }
-        .text-gray-700 { color: var(--gray-700); }
-        .text-gray-800 { color: var(--gray-800); }
-        .text-white { color: #fff; }
-        .text-blue-500 { color: var(--blue-500); }
-        .text-red-500 { color: var(--red-500); }
-        .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
-        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-        .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
-        .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
-        .font-bold { font-weight: 700; }
-        .font-medium { font-weight: 500; }
-        .font-semibold { font-weight: 600; }
-        .p-2 { padding: 0.5rem; }
-        .p-3 { padding: 0.75rem; }
-        .p-4 { padding: 1rem; }
-        .px-4 { padding-left: 1rem; padding-right: 1rem; }
-        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-        .mt-1 { margin-top: 0.25rem; }
-        .mt-2 { margin-top: 0.5rem; }
-        .mt-4 { margin-top: 1rem; }
-        .mb-2 { margin-bottom: 0.5rem; }
-        .mb-4 { margin-bottom: 1rem; }
-        .mb-6 { margin-bottom: 1.5rem; }
-        .mr-2 { margin-right: 0.5rem; }
-        .space-x-2 > :not(:last-child) { margin-right: 0.5rem; }
-        .space-x-4 > :not(:last-child) { margin-right: 1rem; }
-        .space-y-2 > :not(:last-child) { margin-bottom: 0.5rem; }
-        .space-y-4 > :not(:last-child) { margin-bottom: 1rem; }
-        .border { border-width: 1px; border-color: var(--gray-300); }
-        .border-b { border-bottom-width: 1px; border-color: var(--gray-200); }
-        .rounded { border-radius: 0.25rem; }
-        .rounded-lg { border-radius: 0.5rem; }
-        .shadow { box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06); }
-        .shadow-md { box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06); }
-        .w-full { width: 100%; }
-        .min-w-80 { min-width: 20rem; }
-        .flex { display: flex; }
-        .flex-wrap { flex-wrap: wrap; }
-        .flex-col { flex-direction: column; }
-        .items-center { align-items: center; }
-        .justify-between { justify-content: space-between; }
-        .overflow-auto { overflow: auto; }
-        .text-center { text-align: center; }
-        .list-disc { list-style-type: disc; }
-        .pl-5 { padding-left: 1.25rem; }
-        .hover\:underline:hover { text-decoration: underline; }
-        .hover\:bg-blue-600:hover { background-color: var(--blue-600); }
-        .hover\:bg-green-600:hover { background-color: var(--green-600); }
-        .hover\:bg-gray-100:hover { background-color: var(--gray-100); }
-        .hidden { display: none; }
-        .text-xs { font-size: 0.75rem; line-height: 1rem; }
-        .font-sans { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-        .container { width: 100%; margin-right: auto; margin-left: auto; }
-        .mx-auto { margin-left: auto; margin-right: auto; }
-        .max-w-7xl { max-width: 80rem; }
-        .tabs button { padding: 0.5rem 1rem; background-color: var(--gray-50); border: 1px solid var(--gray-300); border-bottom: none; }
-        .tabs button.active { background-color: white; font-weight: bold; }
-    </style>
-</head>
-<body class="bg-gray-100 font-sans">
-    <div class="container mx-auto p-4 max-w-7xl">
-        <h1 class="text-3xl font-bold text-center mb-6">Data Center Project Management Tool</h1>
+<script>
+/* ==================== DATA ==================== */
+const currentUser = 'Josh Mayfield';
+let categories = JSON.parse(localStorage.getItem('dcpm_categories')) || [
+    "Planning & Scheduling","Financial & Reporting","Procurement & Contracts",
+    "Design & Coordination","Compliance & Permits"
+];
+let tasks = JSON.parse(localStorage.getItem('dcpm_tasks')) || [];
+let assignees = JSON.parse(localStorage.getItem('dcpm_assignees')) || ['Josh Mayfield','Clarke Hurd'];
+let taskCounter = parseInt(localStorage.getItem('dcpm_taskCounter')) || 10000000;
 
-        <!-- View Tabs -->
-        <div class="tabs flex space-x-2 mb-4">
-            <button data-view="main" class="rounded-t-lg hover:bg-gray-100 active">Main Tasks</button>
-            <button data-view="history" class="rounded-t-lg hover:bg-gray-100">Project History</button>
-            <button data-view="archived" class="rounded-t-lg hover:bg-gray-100">Archived Tasks</button>
-            <button data-view="deleted" class="rounded-t-lg hover:bg-gray-100">Deleted Tasks</button>
+/* ==================== PERSISTENCE ==================== */
+function persist(){
+    localStorage.setItem('dcpm_categories', JSON.stringify(categories));
+    localStorage.setItem('dcpm_tasks', JSON.stringify(tasks));
+    localStorage.setItem('dcpm_assignees', JSON.stringify(assignees));
+    localStorage.setItem('dcpm_taskCounter', taskCounter);
+}
+
+/* ==================== UI HELPERS ==================== */
+function populateCategorySelect(){
+    const sel = document.getElementById('taskCategory');
+    sel.innerHTML = '';
+    categories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = opt.textContent = cat;
+        sel.appendChild(opt);
+    });
+}
+function clearAddTaskForm(){
+    document.getElementById('taskTitle').value = '';
+    document.getElementById('taskDesc').value = '';
+    document.getElementById('taskDue').value = '';
+    document.getElementById('taskPriority').value = 'low';
+    document.getElementById('taskOwner').value = currentUser;
+    document.getElementById('subscribersInput').innerHTML = '';
+}
+
+/* ==================== TASK RENDERING ==================== */
+function renderTask(task){
+    const div = document.createElement('div');
+    div.className = 'task-item';
+    div.dataset.id = task.id;
+    div.innerHTML = `
+        <div class="font-semibold">${task.title}</div>
+        <div class="text-sm text-gray-600">${task.category}</div>
+        <div class="flex space-x-2 mt-2">
+            <span class="chip">${task.priority}</span>
+            ${task.subscribers.map(s=>`<span class="chip">${s}<span class="chip-remove">×</span></span>`).join('')}
         </div>
+    `;
+    return div;
+}
+function renderTaskList(){
+    const container = document.getElementById('taskList');
+    container.innerHTML = '';
+    if(tasks.length===0){
+        container.innerHTML = '<div class="empty-state">No tasks yet. Click “+ Add Task” to create one.</div>';
+        return;
+    }
+    tasks.forEach(t=>container.appendChild(renderTask(t)));
+}
 
-        <!-- Main Section -->
-        <section id="mainSection" class="space-y-4">
-            <p class="text-gray-600 text-sm">Manage tasks across categories in a Kanban-style board. Drag cards between columns if needed (future feature). Changes save automatically.</p>
+/* ==================== MENU (CATEGORIES) ==================== */
+function renderMenu(){
+    const list = document.getElementById('menuList');
+    list.innerHTML = '';
+    categories.forEach(cat=>{
+        const item = document.createElement('div');
+        item.className = 'menu-item';
+        item.textContent = cat;
+        item.addEventListener('click',()=>filterByCategory(cat));
+        list.appendChild(item);
+    });
+}
+function filterByCategory(cat){
+    document.getElementById('viewHeader').textContent = cat;
+    const filtered = tasks.filter(t=>t.category===cat);
+    const container = document.getElementById('taskList');
+    container.innerHTML = '';
+    if(filtered.length===0){
+        container.innerHTML = '<div class="empty-state">No tasks in this category.</div>';
+    }else{
+        filtered.forEach(t=>container.appendChild(renderTask(t)));
+    }
+}
 
-            <!-- Assignee Filter -->
-            <div class="bg-white p-4 border rounded shadow-md flex items-center space-x-4">
-                <div class="flex-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Filter by Assignee</label>
-                    <select id="assigneeFilter" class="w-full p-2 border rounded"></select>
-                </div>
-                <div class="flex-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Add Assignee</label>
-                    <div class="flex">
-                        <input type="text" id="newAssignee" placeholder="e.g., John Doe" class="flex-1 p-2 border rounded-l">
-                        <button id="addAssigneeBtn" class="p-2 bg-green-500 text-white rounded-r hover:bg-green-600">Add</button>
-                    </div>
-                </div>
-            </div>
+/* ==================== ADD TASK FORM ==================== */
+document.getElementById('showAddForm').addEventListener('click',()=>{
+    document.getElementById('addTaskForm').classList.remove('hidden');
+    document.getElementById('showAddForm').classList.add('hidden');
+    populateCategorySelect();
+});
 
-            <!-- Kanban Board (for all assignees) -->
-            <div id="kanbanBoard" class="flex overflow-auto space-x-4 pb-4">
-                <!-- Columns dynamically added here -->
-            </div>
+document.getElementById('cancelTask').addEventListener('click',()=>{
+    document.getElementById('addTaskForm').classList.add('hidden');
+    document.getElementById('showAddForm').classList.remove('hidden');
+    clearAddTaskForm();
+});
 
-            <!-- Filtered View (single column) -->
-            <div id="filteredView" class="hidden space-y-4">
-                <!-- Filtered tasks grouped by category -->
-            </div>
-        </section>
+/* ----- Subscribers chip input ----- */
+document.getElementById('subscribersInput').addEventListener('keydown',e=>{
+    if(e.key==='Enter' && e.target.value.trim()){
+        const chip = document.createElement('span');
+        chip.className='chip';
+        const name = e.target.value.trim();
+        chip.innerHTML = `${name}<span class="chip-remove">×</span>`;
+        chip.querySelector('.chip-remove').onclick = ()=>chip.remove();
+        e.target.before(chip);
+        e.target.value='';
+        e.preventDefault();
+    }
+});
 
-        <!-- History Section -->
-        <section id="historySection" class="hidden space-y-4">
-            <p class="text-gray-600 text-sm">Chronological log of actions.</p>
-            <ul id="historyList" class="space-y-2 border rounded bg-white p-4 shadow-md"></ul>
-        </section>
+/* ----- Submit new task ----- */
+document.getElementById('submitTask').addEventListener('click',()=>{
+    const title = document.getElementById('taskTitle').value.trim();
+    if(!title) return alert('Title is required');
 
-        <!-- Archived Section -->
-        <section id="archivedSection" class="hidden space-y-4">
-            <p class="text-gray-600 text-sm">Archived tasks for reference.</p>
-            <ul id="archivedList" class="space-y-4 border rounded bg-white p-4 shadow-md"></ul>
-        </section>
+    const subscribers = Array.from(document.querySelectorAll('#subscribersInput .chip'))
+                            .map(c=>c.firstChild.textContent);
 
-        <!-- Deleted Section -->
-        <section id="deletedSection" class="hidden space-y-4">
-            <p class="text-gray-600 text-sm">Deleted tasks for reference.</p>
-            <ul id="deletedList" class="space-y-4 border rounded bg-white p-4 shadow-md"></ul>
-        </section>
-    </div>
+    const newTask = {
+        id: ++taskCounter,
+        title,
+        description: document.getElementById('taskDesc').value,
+        due: document.getElementById('taskDue').value,
+        priority: document.getElementById('taskPriority').value,
+        category: document.getElementById('taskCategory').value,
+        owner: document.getElementById('taskOwner').value,
+        subscribers,
+        starred: false
+    };
+    tasks.push(newTask);
+    persist();
+    renderTaskList();
+    document.getElementById('addTaskForm').classList.add('hidden');
+    document.getElementById('showAddForm').classList.remove('hidden');
+    clearAddTaskForm();
+});
 
-    <script>
-        // Data
-        const CATEGORIES = [
-            "Planning & Scheduling",
-            "Financial & Reporting",
-            "Procurement & Contracts",
-            "Design & Coordination",
-            "Compliance & Permits"
-        ];
+/* ==================== ADD CATEGORY ==================== */
+document.getElementById('addCategoryBtn').addEventListener('click',()=>{
+    const input = document.getElementById('newCategory');
+    const name = input.value.trim();
+    if(name && !categories.includes(name)){
+        categories.push(name);
+        persist();
+        renderMenu();
+        input.value='';
+    }
+});
 
-        let tasks = JSON.parse(localStorage.getItem('dcpm_tasks')) || CATEGORIES.reduce((o, c) => (o[c] = [], o), {});
-        let history = JSON.parse(localStorage.getItem('dcpm_history')) || [];
-        let archived = JSON.parse(localStorage.getItem('dcpm_archived')) || [];
-        let deleted = JSON.parse(localStorage.getItem('dcpm_deleted')) || [];
-        let assignees = JSON.parse(localStorage.getItem('dcpm_assignees')) || ['Josh Mayfield', 'Clarke Hurd'];
+/* ==================== TASK CONTEXT MENU ==================== */
+let currentContextTask = null;
+document.getElementById('taskList').addEventListener('contextmenu',e=>{
+    const item = e.target.closest('.task-item');
+    if(!item) return;
+    e.preventDefault();
+    currentContextTask = tasks.find(t=>t.id==item.dataset.id);
+    const menu = document.getElementById('contextMenu');
+    menu.style.left = `${e.pageX}px`;
+    menu.style.top = `${e.pageY}px`;
+    menu.style.display = 'block';
+});
+document.addEventListener('click',()=>document.getElementById('contextMenu').style.display='none');
 
-        function persist() {
-            localStorage.setItem('dcpm_tasks', JSON.stringify(tasks));
-            localStorage.setItem('dcpm_history', JSON.stringify(history));
-            localStorage.setItem('dcpm_archived', JSON.stringify(archived));
-            localStorage.setItem('dcpm_deleted', JSON.stringify(deleted));
-            localStorage.setItem('dcpm_assignees', JSON.stringify(assignees));
-        }
-
-        // Helpers
-        const esc = str => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
-        const ts = () => new Date().toLocaleString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        const priColor = p => p === 'low' ? '#fbbf24' : p === 'mid' ? '#f97316' : '#ef4444';
-
-        // Render Functions
-        function renderAssignees() {
-            const sel = document.getElementById('assigneeFilter');
-            sel.innerHTML = '<option value="all">All Assignees</option>' + assignees.map(a => `<option value="${esc(a)}">${esc(a === 'Josh Mayfield' ? 'My Tasks (Josh Mayfield)' : a)}</option>`).join('');
-        }
-
-        function renderKanban() {
-            const board = document.getElementById('kanbanBoard');
-            board.innerHTML = '';
-            CATEGORIES.forEach(cat => {
-                const col = document.createElement('div');
-                col.className = 'min-w-80 flex-col bg-white rounded-lg shadow-md p-4 space-y-2';
-                col.innerHTML = `
-                    <h3 class="text-lg font-semibold mb-2">${esc(cat)}</h3>
-                    <div class="space-y-2 flex-1" id="tasks_${cat.replace(/\s+/g, '')}"></div>
-                    <div class="border-t pt-2 space-y-2">
-                        <input type="text" data-id="title" placeholder="Task title" class="w-full p-2 border rounded">
-                        <textarea data-id="desc" rows="2" placeholder="Description (optional)" class="w-full p-2 border rounded"></textarea>
-                        <input type="date" data-id="due" class="w-full p-2 border rounded">
-                        <select data-id="pri" class="w-full p-2 border rounded">
-                            <option value="low">Low</option>
-                            <option value="mid">Mid</option>
-                            <option value="high">High</option>
-                        </select>
-                        <input type="text" data-id="assignee" value="Josh Mayfield" placeholder="Assignee" class="w-full p-2 border rounded">
-                        <button data-action="addTask" data-cat="${esc(cat)}" class="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600">Add Task</button>
-                    </div>`;
-                board.appendChild(col);
-                renderCategoryTasks(cat);
-            });
-        }
-
-        function renderCategoryTasks(cat) {
-            const container = document.querySelector(`#tasks_${cat.replace(/\s+/g, '')}`);
-            if (!container) return;
-            container.innerHTML = tasks[cat].map((t, i) => taskCard(cat, t, i)).join('') || '<p class="text-sm text-gray-500">No tasks yet.</p>';
-        }
-
-        function taskCard(cat, t, i) {
-            const safeId = `${cat.replace(/\s+/g, '')}_${i}`;
-            return `
-                <div class="border rounded p-3 bg-gray-50 space-y-1 shadow">
-                    <div class="flex justify-between items-start">
-                        <h4 class="font-bold text-sm">${esc(t.title)}</h4>
-                        <span class="px-2 py-1 rounded text-white text-xs" style="background:${priColor(t.priority)}">${t.priority.toUpperCase()}</span>
-                    </div>
-                    <p class="text-sm text-gray-600">${esc(t.description || 'No description')}</p>
-                    <p class="text-xs text-gray-500">Due: ${t.dueDate || 'None'}</p>
-                    <p class="text-xs text-gray-500">Assignee: ${esc(t.assignee)}</p>
-                    ${t.comments.length ? `<p class="text-xs text-gray-500">Comments: ${t.comments.length}</p>` : ''}
-                    <div class="flex space-x-2 mt-2">
-                        <button data-action="toggleComment" data-id="${safeId}" class="text-xs text-blue-500 hover:underline">Comment</button>
-                        <button data-action="archive" data-cat="${esc(cat)}" data-idx="${i}" class="text-xs text-blue-500 hover:underline">Archive</button>
-                        <button data-action="delete" data-cat="${esc(cat)}" data-idx="${i}" class="text-xs text-red-500 hover:underline">Delete</button>
-                    </div>
-                    <div id="comment_${safeId}" class="hidden mt-2 space-y-1">
-                        ${t.comments.map(c => `<p class="text-xs text-gray-600 border-b py-1">${esc(c.timestamp)}: ${esc(c.text)}</p>`).join('')}
-                        <textarea placeholder="Add comment" class="w-full p-2 border rounded text-sm"></textarea>
-                        <button data-action="addComment" data-cat="${esc(cat)}" data-idx="${i}" class="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">Submit</button>
-                    </div>
-                </div>`;
-        }
-
-        function renderFiltered() {
-            const assignee = document.getElementById('assigneeFilter').value;
-            const fv = document.getElementById('filteredView');
-            fv.innerHTML = `<h3 class="text-xl font-bold mb-4">Tasks for ${esc(assignee)}</h3>`;
-            let hasTasks = false;
-            CATEGORIES.forEach(cat => {
-                const ft = tasks[cat].filter(t => t.assignee === assignee);
-                if (ft.length) {
-                    hasTasks = true;
-                    fv.innerHTML += `<h4 class="font-semibold text-lg mb-2">${esc(cat)}</h4>` + ft.map((t, _) => {
-                        const i = tasks[cat].findIndex(task => task === t); // Correct index
-                        return taskCard(cat, t, i);
-                    }).join('');
-                }
-            });
-            if (!hasTasks) fv.innerHTML += '<p class="text-gray-600">No tasks for this assignee.</p>';
-        }
-
-        function renderHistory() {
-            document.getElementById('historyList').innerHTML = history.map(e => `<li class="text-sm text-gray-600 border-b py-2">${esc(e)}</li>`).join('') || '<li class="text-sm text-gray-600">No history yet.</li>';
-        }
-
-        function renderArchived() {
-            document.getElementById('archivedList').innerHTML = archived.map(t => listItem(t)).join('') || '<p class="text-sm text-gray-600">No archived tasks.</p>';
-        }
-
-        function renderDeleted() {
-            document.getElementById('deletedList').innerHTML = deleted.map(t => listItem(t)).join('') || '<p class="text-sm text-gray-600">No deleted tasks.</p>';
-        }
-
-        function listItem(t) {
-            return `
-                <li class="border rounded p-3 bg-gray-50 space-y-1 shadow">
-                    <div class="flex justify-between">
-                        <h4 class="font-bold text-sm">${esc(t.title)} <span class="text-gray-500">(${esc(t.category)})</span></h4>
-                        <span class="px-2 py-1 rounded text-white text-xs" style="background:${priColor(t.priority)}">${t.priority.toUpperCase()}</span>
-                    </div>
-                    <p class="text-sm text-gray-600">${esc(t.description || 'No description')}</p>
-                    <p class="text-xs text-gray-500">Due: ${t.dueDate || 'None'}</p>
-                    <p class="text-xs text-gray-500">Assignee: ${esc(t.assignee)}</p>
-                    ${t.comments.length ? t.comments.map(c => `<p class="text-xs text-gray-600 border-t pt-1">${esc(c.timestamp)}: ${esc(c.text)}</p>`).join('') : ''}
-                </li>`;
-        }
-
-        // Actions
-        function addTask(cat, form) {
-            const title = form.querySelector('[data-id="title"]').value.trim();
-            if (!title) return alert('Title required.');
-            const desc = form.querySelector('[data-id="desc"]').value.trim();
-            const due = form.querySelector('[data-id="due"]').value;
-            const pri = form.querySelector('[data-id="pri"]').value;
-            const asn = form.querySelector('[data-id="assignee"]').value.trim() || 'Josh Mayfield';
-            if (!assignees.includes(asn)) {
-                assignees.push(asn);
-                renderAssignees();
-            }
-            const task = { title, description: desc, dueDate: due, priority: pri, assignee: asn, comments: [] };
-            tasks[cat].push(task);
-            history.push(`${ts()} - Added: ${title} in ${cat} (Assignee: ${asn}, Due: ${due || 'None'}, Pri: ${pri.toUpperCase()})`);
+document.querySelectorAll('.context-menu-item').forEach(item=>{
+    item.addEventListener('click',()=>{
+        const action = item.dataset.action;
+        if(!currentContextTask) return;
+        if(action==='open') openDetails(currentContextTask);
+        else if(action==='star'){
+            currentContextTask.starred = !currentContextTask.starred;
             persist();
-            form.querySelectorAll('input, textarea').forEach(el => el.value = el.type === 'date' ? '' : el.dataset.id === 'assignee' ? 'Josh Mayfield' : '');
-            form.querySelector('[data-id="pri"]').value = 'low';
-            updateMainView();
-            renderHistory();
+            renderTaskList();
         }
-
-        function addComment(cat, idx, txtEl) {
-            const txt = txtEl.value.trim();
-            if (!txt) return;
-            const time = ts();
-            tasks[cat][idx].comments.push({ text: txt, timestamp: time });
-            history.push(`${time} - Comment on "${tasks[cat][idx].title}" in ${cat}`);
-            txtEl.value = '';
+        else if(action==='duplicate'){
+            const dup = {...currentContextTask, id:++taskCounter, title: currentContextTask.title+' (copy)'};
+            tasks.push(dup);
             persist();
-            updateMainView();
-            renderHistory();
+            renderTaskList();
         }
-
-        function archive(cat, idx) {
-            const t = tasks[cat].splice(idx, 1)[0];
-            archived.push({ ...t, category: cat });
-            history.push(`${ts()} - Archived: ${t.title} from ${cat}`);
-            persist();
-            updateMainView();
-            renderArchived();
-            renderHistory();
-        }
-
-        function del(cat, idx) {
-            const t = tasks[cat].splice(idx, 1)[0];
-            deleted.push({ ...t, category: cat });
-            history.push(`${ts()} - Deleted: ${t.title} from ${cat}`);
-            persist();
-            updateMainView();
-            renderDeleted();
-            renderHistory();
-        }
-
-        function updateMainView() {
-            const sel = document.getElementById('assigneeFilter').value;
-            document.getElementById('kanbanBoard').classList.toggle('hidden', sel !== 'all');
-            document.getElementById('filteredView').classList.toggle('hidden', sel === 'all');
-            if (sel === 'all') renderKanban();
-            else renderFiltered();
-        }
-
-        // Event Delegation
-        document.addEventListener('click', e => {
-            const btn = e.target;
-            const act = btn.dataset.action;
-            if (!act) return;
-
-            if (act === 'addTask') {
-                const form = btn.closest('.space-y-2');
-                addTask(btn.dataset.cat, form);
-            } else if (act === 'addComment') {
-                const txt = btn.previousElementSibling;
-                addComment(btn.dataset.cat, +btn.dataset.idx, txt);
-            } else if (act === 'archive') archive(btn.dataset.cat, +btn.dataset.idx);
-            else if (act === 'delete') del(btn.dataset.cat, +btn.dataset.idx);
-            else if (act === 'toggleComment') {
-                const id = btn.dataset.id;
-                document.getElementById(`comment_${id}`).classList.toggle('hidden');
-            }
-        });
-
-        // Tabs
-        document.querySelector('.tabs').addEventListener('click', e => {
-            if (e.target.tagName !== 'BUTTON') return;
-            document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-            ['mainSection', 'historySection', 'archivedSection', 'deletedSection'].forEach(id => document.getElementById(id).classList.add('hidden'));
-            document.getElementById(`${e.target.dataset.view}Section`).classList.remove('hidden');
-        });
-
-        // Assignee Filter Change
-        document.getElementById('assigneeFilter').addEventListener('change', updateMainView);
-
-        // Add Assignee
-        document.getElementById('addAssigneeBtn').addEventListener('click', () => {
-            const val = document.getElementById('newAssignee').value.trim();
-            if (val && !assignees.includes(val)) {
-                assignees.push(val);
+        else if(action==='delete'){
+            if(confirm('Delete this task?')){
+                tasks = tasks.filter(t=>t.id!==currentContextTask.id);
                 persist();
-                renderAssignees();
-                document.getElementById('newAssignee').value = '';
+                renderTaskList();
+                closeDetails();
             }
-        });
+        }
+        document.getElementById('contextMenu').style.display='none';
+    });
+});
 
-        // Init
-        renderAssignees();
-        updateMainView();
-        renderHistory();
-        renderArchived();
-        renderDeleted();
-        document.querySelector('[data-view="main"]').classList.add('active');
-        document.getElementById('mainSection').classList.remove('hidden');
-    </script>
-</body>
-</html>
-</html>
+/* ==================== DETAILS PANE ==================== */
+function openDetails(task){
+    document.getElementById('detailsPane').style.display='block';
+    document.getElementById('taskIdDisplay').textContent = `#${task.id} – ${task.title}`;
+    const prio = document.getElementById('priorityBadge');
+    prio.textContent = task.priority.toUpperCase();
+    prio.className = `priority-high ${task.priority==='high'?'bg-red-500':task.priority==='mid'?'bg-yellow-400':'bg-green-500'}`;
+
+    document.getElementById('detailsContent').innerHTML = `
+        <div class="section-header">Description</div>
+        <p>${task.description||'<em>None</em>'}</p>
+        <div class="section-header">Due Date</div>
+        <p>${task.due||'<em>None</em>'}</p>
+        <div class="section-header">Owner</div>
+        <p>${task.owner}</p>
+        <div class="section-header">Subscribers</div>
+        <div>${task.subscribers.map(s=>`<span class="chip">${s}</span>`).join('') || '<em>None</em>'}</div>
+        <div class="section-header mt-4">
+            <button class="btn btn-primary mr-2">Edit</button>
+            <button class="btn bg-gray-300 text-gray-700">Save</button>
+        </div>
+    `;
+}
+function closeDetails(){
+    document.getElementById('detailsPane').style.display='none';
+}
+document.getElementById('closeDetails').addEventListener('click',closeDetails);
+
+/* ==================== INITIALISATION ==================== */
+document.addEventListener('DOMContentLoaded',()=>{
+    document.getElementById('addTaskForm').classList.add('hidden');
+    renderMenu();
+    renderTaskList();
+    populateCategorySelect();
+    // default view
+    if(categories.length) filterByCategory(categories[0]);
+});
+</script>
