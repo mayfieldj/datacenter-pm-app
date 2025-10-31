@@ -1,154 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Data Center Project Management Tool</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-    :root{
-        --blue-500:#3b82f6;--blue-600:#2563eb;--green-500:#10b981;--green-600:#059669;
-        --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;
-        --gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;
-        --gray-800:#1f2937;--red-500:#ef4444;--yellow-400:#fbbf24;--orange-500:#f97316;
-        --red-600:#dc2626;
-    }
-    body{background:var(--gray-100);font-family:system-ui,-apple-system,sans-serif;margin:0;}
-    .container{display:flex;height:100vh;}
-    .sidebar{width:250px;background:#fff;border-right:1px solid var(--gray-200);padding:1rem;overflow-y:auto;}
-    .main{flex:1;padding:1rem;background:var(--gray-50);overflow-y:auto;}
-    .details{width:400px;background:#fff;border-left:1px solid var(--gray-200);padding:1rem;overflow-y:auto;display:none;}
-    .task-item{background:#fff;padding:1rem;border-radius:.5rem;box-shadow:0 1px 3px rgba(0,0,0,.1);cursor:pointer;margin-bottom:.75rem;position:relative;}
-    .task-item:hover{background:var(--gray-100);}
-    .priority-high{background:var(--red-500);color:#fff;padding:.25rem .5rem;border-radius:.25rem;font-size:.75rem;}
-    .priority-mid{background:var(--yellow-400);color:#fff;padding:.25rem .5rem;border-radius:.25rem;font-size:.75rem;}
-    .priority-low{background:var(--green-500);color:#fff;padding:.25rem .5rem;border-radius:.25rem;font-size:.75rem;}
-    .chip{background:var(--gray-200);padding:.25rem .5rem;border-radius:1rem;margin-right:.5rem;margin-bottom:.5rem;display:inline-block;font-size:.75rem;}
-    .chip-remove{cursor:pointer;margin-left:.25rem;}
-    .section-header{font-size:.875rem;color:var(--gray-500);margin:1rem 0 .5rem;font-weight:600;}
-    .hidden{display:none;}
-    .flex{display:flex;}
-    .items-center{align-items:center;}
-    .space-x-2 > :not(:last-child){margin-right:.5rem;}
-    .space-x-4 > :not(:last-child){margin-right:1rem;}
-    .space-y-4 > :not(:last-child){margin-bottom:1rem;}
-    .space-y-2 > :not(:last-child){margin-bottom:.5rem;}
-    .border{border:1px solid var(--gray-300);}
-    .rounded{border-radius:.25rem;}
-    .rounded-lg{border-radius:.5rem;}
-    .p-2{padding:.5rem;}
-    .p-3{padding:.75rem;}
-    .text-sm{font-size:.875rem;}
-    .text-xs{font-size:.75rem;}
-    .font-bold{font-weight:bold;}
-    .font-semibold{font-weight:600;}
-    .hover\:bg-blue-600:hover{background:var(--blue-600);}
-    .bg-blue-500{background:var(--blue-500);}
-    .bg-green-500{background:var(--green-500);}
-    .text-white{color:#fff;}
-    .w-full{width:100%;}
-    .btn{padding:.5rem 1rem;border-radius:.25rem;font-size:.875rem;}
-    .btn-primary{background:var(--blue-500);color:#fff;}
-    .btn-success{background:var(--green-500);color:#fff;}
-    .close-btn{color:var(--red-500);font-weight:bold;cursor:pointer;}
-    .input-group{margin-bottom:.75rem;}
-    .input-group label{display:block;font-size:.875rem;color:var(--gray-700);margin-bottom:.25rem;}
-    .input-group input,.input-group textarea,.input-group select{width:100%;padding:.5rem;border:1px solid var(--gray-300);border-radius:.25rem;}
-    .chip-input{display:flex;flex-wrap:wrap;gap:.25rem;padding:.5rem;border:1px solid var(--gray-300);border-radius:.25rem;min-height:38px;align-items:center;}
-    .chip-input input{border:none;outline:none;flex:1;min-width:120px;}
-    .view-header{font-size:1.25rem;font-weight:600;color:var(--gray-800);margin-bottom:1rem;}
-    .empty-state{text-align:center;padding:2rem;color:var(--gray-500);font-style:italic;}
-    .form-card{background:#fff;padding:1.5rem;border-radius:.5rem;box-shadow:0 1px 3px rgba(0,0,0,.1);}
-    .menu-item{padding:0.5rem 0.75rem;border-radius:0.25rem;cursor:pointer;}
-    .menu-item:hover{background:var(--gray-100);}
-    .menu-item.active{background:var(--blue-500);color:#fff;}
-    /* Context Menu */
-    .context-menu{
-        position:absolute;background:#fff;border:1px solid var(--gray-300);border-radius:.5rem;
-        box-shadow:0 4px 12px rgba(0,0,0,.15);z-index:1000;min-width:160px;
-        display:none;font-size:.875rem;
-    }
-    .context-menu-item{
-        padding:.5rem 1rem;cursor:pointer;display:flex;align-items:center;
-    }
-    .context-menu-item:hover{background:var(--gray-100);}
-    .context-menu-item.danger{color:var(--red-500);}
-    /* Comments */
-    .comment-thread{margin-top:1rem;}
-    .comment-item{border-top:1px solid var(--gray-200);padding:0.5rem 0;}
-    .comment-author{font-weight:600;}
-    .comment-date{color:var(--gray-500);font-size:0.75rem;}
-    /* Floating Add Button */
-    .floating-add-btn{position:fixed;bottom:2rem;right:2rem;background:var(--green-500);color:#fff;width:3rem;height:3rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,.2);}
-    .floating-add-btn:hover{background:var(--green-600);}
-</style>
-</head>
-<body>
-<div class="container">
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h2 class="text-lg font-bold mb-4">Views</h2>
-        <div id="menuList"></div>
-        <div class="menu-item" id="ownerView">My Tasks (Owner)</div>
-        <div class="mt-6">
-            <input type="text" id="newCategory" placeholder="New Category" class="p-2 border rounded w-full mb-2">
-            <button id="addCategoryBtn" class="p-2 bg-blue-500 text-white rounded w-full hover:bg-blue-600">Add Category</button>
-        </div>
-    </div>
-    <!-- Main -->
-    <div class="main">
-        <h1 class="text-2xl font-bold mb-4 text-gray-800">Data Center Project Management Tool</h1>
-        <div id="viewHeader" class="view-header"></div>
-        <div id="taskList"></div>
-        <!-- Add Task Form -->
-        <div id="addTaskForm" class="hidden form-card space-y-4">
-            <h2 class="text-lg font-bold">Create New Task</h2>
-            <div class="input-group"><label>Title</label><input type="text" id="taskTitle"></div>
-            <div class="input-group"><label>Description</label><textarea id="taskDesc" rows="3"></textarea></div>
-            <div class="flex space-x-4">
-                <div class="input-group flex-1"><label>Due Date</label><input type="date" id="taskDue"></div>
-                <div class="input-group flex-1"><label>Priority</label>
-                    <select id="taskPriority"><option value="low">Low</option><option value="mid">Mid</option><option value="high">High</option></select>
-                </div>
-            </div>
-            <div class="flex space-x-4">
-                <div class="input-group flex-1"><label>Category</label><select id="taskCategory"></select></div>
-                <div class="input-group flex-1"><label>Owner</label><input type="text" id="taskOwner" value="Josh Mayfield"></div>
-            </div>
-            <div class="input-group">
-                <label>Subscribers</label>
-                <div id="subscribersInput" class="chip-input"><input type="text" placeholder="Type name and press Enter"></div>
-            </div>
-            <div class="flex space-x-2">
-                <button type="button" id="submitTask" class="btn btn-primary flex-1">Create Task</button>
-                <button type="button" id="cancelTask" class="btn bg-gray-300 text-gray-700 flex-1">Cancel</button>
-            </div>
-        </div>
-    </div>
-    <!-- Details Pane -->
-    <div class="details" id="detailsPane">
-        <div class="flex justify-between items-center mb-4">
-            <span id="taskIdDisplay" class="text-lg font-bold"></span>
-            <span id="priorityBadge" class="priority-high"></span>
-        </div>
-        <button id="closeDetails" class="close-btn mb-4">× Close</button>
-        <div id="detailsContent"></div>
-        <div class="section-header">Comments</div>
-        <div id="commentList" class="comment-thread"></div>
-        <div class="input-group mt-2">
-            <textarea id="newComment" rows="2" placeholder="Add a comment..."></textarea>
-        </div>
-        <button id="addCommentBtn" class="btn btn-primary w-full mt-2">Post Comment</button>
-    </div>
-    <!-- Context Menu -->
-    <div id="contextMenu" class="context-menu">
-        <div class="context-menu-item" data-action="open">Open</div>
-        <div class="context-menu-item" data-action="star">Star</div>
-        <div class="context-menu-item" data-action="duplicate">Duplicate</div>
-        <div class="context-menu-item danger" data-action="delete">Delete</div>
-    </div>
-    <!-- Floating Add Button -->
-    <div id="floatingAddBtn" class="floating-add-btn">+</div>
-</div>
 <script>
 /* ==================== DATA ==================== */
 const currentUser = 'Josh Mayfield';
@@ -184,7 +33,7 @@ function clearAddTaskForm(){
     document.getElementById('taskDue').value = '';
     document.getElementById('taskPriority').value = 'low';
     document.getElementById('taskOwner').value = currentUser;
-    document.getElementById('subscribersInput').innerHTML = '<input type="text" placeholder="Type name and press Enter">';
+    document.getElementById('subscribersInput').innerHTML = '';
 }
 
 /* ==================== TASK RENDERING ==================== */
@@ -196,20 +45,20 @@ function renderTask(task){
         <div class="font-semibold">${task.title}</div>
         <div class="text-sm text-gray-600">${task.category}</div>
         <div class="flex space-x-2 mt-2">
-            <span class="chip priority-${task.priority}">${task.priority}</span>
+            <span class="chip">${task.priority}</span>
             ${task.subscribers.map(s=>`<span class="chip">${s}<span class="chip-remove">×</span></span>`).join('')}
         </div>
     `;
     return div;
 }
-function renderTaskList(filteredTasks = tasks){
+function renderTaskList(){
     const container = document.getElementById('taskList');
     container.innerHTML = '';
-    if(filteredTasks.length===0){
-        container.innerHTML = '<div class="empty-state">No tasks yet. Click “+” to create one.</div>';
+    if(tasks.length===0){
+        container.innerHTML = '<div class="empty-state">No tasks yet. Click “+ Add Task” to create one.</div>';
         return;
     }
-    filteredTasks.forEach(t=>container.appendChild(renderTask(t)));
+    tasks.forEach(t=>container.appendChild(renderTask(t)));
 }
 
 /* ==================== MENU (CATEGORIES) ==================== */
@@ -227,51 +76,49 @@ function renderMenu(){
 function filterByCategory(cat){
     document.getElementById('viewHeader').textContent = cat;
     const filtered = tasks.filter(t=>t.category===cat);
-    renderTaskList(filtered);
+    const container = document.getElementById('taskList');
+    container.innerHTML = '';
+    if(filtered.length===0){
+        container.innerHTML = '<div class="empty-state">No tasks in this category.</div>';
+    }else{
+        filtered.forEach(t=>container.appendChild(renderTask(t)));
+    }
 }
 
-/* ==================== OWNER VIEW ==================== */
-document.getElementById('ownerView').addEventListener('click',()=>{
-    document.getElementById('viewHeader').textContent = 'My Tasks (Owner)';
-    const filtered = tasks.filter(t=>t.owner===currentUser);
-    renderTaskList(filtered);
-});
-
 /* ==================== ADD TASK FORM ==================== */
-document.getElementById('floatingAddBtn').addEventListener('click',()=>{
+document.getElementById('showAddForm').addEventListener('click',()=>{
     document.getElementById('addTaskForm').classList.remove('hidden');
+    document.getElementById('showAddForm').classList.add('hidden');
     populateCategorySelect();
 });
 
 document.getElementById('cancelTask').addEventListener('click',()=>{
     document.getElementById('addTaskForm').classList.add('hidden');
+    document.getElementById('showAddForm').classList.remove('hidden');
     clearAddTaskForm();
 });
 
 /* ----- Subscribers chip input ----- */
-document.getElementById('subscribersInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter' && e.target.value.trim()) {
-        const name = e.target.value.trim();
+document.getElementById('subscribersInput').addEventListener('keydown',e=>{
+    if(e.key==='Enter' && e.target.value.trim()){
         const chip = document.createElement('span');
-        chip.className = 'chip';
+        chip.className='chip';
+        const name = e.target.value.trim();
         chip.innerHTML = `${name}<span class="chip-remove">×</span>`;
-        chip.querySelector('.chip-remove').onclick = () => chip.remove();
+        chip.querySelector('.chip-remove').onclick = ()=>chip.remove();
         e.target.before(chip);
-        e.target.value = '';
+        e.target.value='';
         e.preventDefault();
     }
 });
 
-/* ----- Submit new task (FIXED) ----- */
-document.getElementById('submitTask').addEventListener('click', () => {
+/* ----- Submit new task ----- */
+document.getElementById('submitTask').addEventListener('click',()=>{
     const title = document.getElementById('taskTitle').value.trim();
-    if (!title) {
-        alert('Title is required');
-        return;
-    }
+    if(!title) return alert('Title is required');
 
-    const subscriberChips = document.querySelectorAll('#subscribersInput .chip');
-    const subscribers = Array.from(subscriberChips).map(chip => chip.firstChild.textContent.trim());
+    const subscribers = Array.from(document.querySelectorAll('#subscribersInput .chip'))
+                            .map(c=>c.firstChild.textContent);
 
     const newTask = {
         id: ++taskCounter,
@@ -282,14 +129,13 @@ document.getElementById('submitTask').addEventListener('click', () => {
         category: document.getElementById('taskCategory').value,
         owner: document.getElementById('taskOwner').value,
         subscribers,
-        starred: false,
-        comments: []
+        starred: false
     };
-
     tasks.push(newTask);
     persist();
     renderTaskList();
     document.getElementById('addTaskForm').classList.add('hidden');
+    document.getElementById('showAddForm').classList.remove('hidden');
     clearAddTaskForm();
 });
 
@@ -307,55 +153,53 @@ document.getElementById('addCategoryBtn').addEventListener('click',()=>{
 
 /* ==================== TASK CONTEXT MENU ==================== */
 let currentContextTask = null;
-document.getElementById('taskList').addEventListener('contextmenu', e => {
+document.getElementById('taskList').addEventListener('contextmenu',e=>{
     const item = e.target.closest('.task-item');
     if(!item) return;
     e.preventDefault();
-    currentContextTask = tasks.find(t => t.id == item.dataset.id);
+    currentContextTask = tasks.find(t=>t.id==item.dataset.id);
     const menu = document.getElementById('contextMenu');
     menu.style.left = `${e.pageX}px`;
     menu.style.top = `${e.pageY}px`;
     menu.style.display = 'block';
 });
-document.addEventListener('click', () => document.getElementById('contextMenu').style.display = 'none');
+document.addEventListener('click',()=>document.getElementById('contextMenu').style.display='none');
 
-document.querySelectorAll('.context-menu-item').forEach(item => {
-    item.addEventListener('click', () => {
+document.querySelectorAll('.context-menu-item').forEach(item=>{
+    item.addEventListener('click',()=>{
         const action = item.dataset.action;
-        if (!currentContextTask) return;
-        if (action === 'open') openDetails(currentContextTask);
-        else if (action === 'star') {
+        if(!currentContextTask) return;
+        if(action==='open') openDetails(currentContextTask);
+        else if(action==='star'){
             currentContextTask.starred = !currentContextTask.starred;
             persist();
             renderTaskList();
         }
-        else if (action === 'duplicate') {
-            const dup = {...currentContextTask, id: ++taskCounter, title: currentContextTask.title + ' (copy)', comments: []};
+        else if(action==='duplicate'){
+            const dup = {...currentContextTask, id:++taskCounter, title: currentContextTask.title+' (copy)'};
             tasks.push(dup);
             persist();
             renderTaskList();
         }
-        else if (action === 'delete') {
-            if (confirm('Delete this task?')) {
-                tasks = tasks.filter(t => t.id !== currentContextTask.id);
+        else if(action==='delete'){
+            if(confirm('Delete this task?')){
+                tasks = tasks.filter(t=>t.id!==currentContextTask.id);
                 persist();
                 renderTaskList();
                 closeDetails();
             }
         }
-        document.getElementById('contextMenu').style.display = 'none';
+        document.getElementById('contextMenu').style.display='none';
     });
 });
 
 /* ==================== DETAILS PANE ==================== */
-let currentOpenTask = null;
 function openDetails(task){
-    currentOpenTask = task;
-    document.getElementById('detailsPane').style.display = 'block';
+    document.getElementById('detailsPane').style.display='block';
     document.getElementById('taskIdDisplay').textContent = `#${task.id} – ${task.title}`;
     const prio = document.getElementById('priorityBadge');
     prio.textContent = task.priority.toUpperCase();
-    prio.className = `chip priority-${task.priority}`;
+    prio.className = `priority-high ${task.priority==='high'?'bg-red-500':task.priority==='mid'?'bg-yellow-400':'bg-green-500'}`;
 
     document.getElementById('detailsContent').innerHTML = `
         <div class="section-header">Description</div>
@@ -366,56 +210,24 @@ function openDetails(task){
         <p>${task.owner}</p>
         <div class="section-header">Subscribers</div>
         <div>${task.subscribers.map(s=>`<span class="chip">${s}</span>`).join('') || '<em>None</em>'}</div>
+        <div class="section-header mt-4">
+            <button class="btn btn-primary mr-2">Edit</button>
+            <button class="btn bg-gray-300 text-gray-700">Save</button>
+        </div>
     `;
-    renderComments(task.comments);
 }
 function closeDetails(){
-    document.getElementById('detailsPane').style.display = 'none';
-    currentOpenTask = null;
+    document.getElementById('detailsPane').style.display='none';
 }
-document.getElementById('closeDetails').addEventListener('click', closeDetails);
-
-/* ==================== COMMENTS ==================== */
-function renderComments(comments){
-    const container = document.getElementById('commentList');
-    container.innerHTML = '';
-    if (comments.length === 0) {
-        container.innerHTML = '<div class="empty-state">No comments yet.</div>';
-        return;
-    }
-    comments.forEach(comment => {
-        const div = document.createElement('div');
-        div.className = 'comment-item';
-        div.innerHTML = `
-            <div class="comment-author">${comment.author}</div>
-            <div class="comment-date">${comment.date}</div>
-            <p>${comment.text}</p>
-        `;
-        container.appendChild(div);
-    });
-}
-
-document.getElementById('addCommentBtn').addEventListener('click', () => {
-    const text = document.getElementById('newComment').value.trim();
-    if (!text || !currentOpenTask) return;
-    currentOpenTask.comments.push({
-        author: currentUser,
-        date: new Date().toLocaleString(),
-        text
-    });
-    persist();
-    renderComments(currentOpenTask.comments);
-    document.getElementById('newComment').value = '';
-});
+document.getElementById('closeDetails').addEventListener('click',closeDetails);
 
 /* ==================== INITIALISATION ==================== */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded',()=>{
     document.getElementById('addTaskForm').classList.add('hidden');
     renderMenu();
     renderTaskList();
     populateCategorySelect();
-    if (categories.length) filterByCategory(categories[0]);
+    // default view
+    if(categories.length) filterByCategory(categories[0]);
 });
 </script>
-</body>
-</html>
