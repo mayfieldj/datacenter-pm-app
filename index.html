@@ -1,3 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Data Center Project Management Tool</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    :root{
+        --blue-500:#3b82f6;--blue-600:#2563eb;--green-500:#10b981;--green-600:#059669;
+        --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;
+        --gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;
+        --gray-800:#1f2937;--red-500:#ef4444;--yellow-400:#fbbf24;--orange-500:#f97316;
+        --red-600:#dc2626;
+    }
+    body{background:var(--gray-100);font-family:system-ui,-apple-system,sans-serif;margin:0;}
+    .container{display:flex;height:100vh;}
+    .sidebar{width:250px;background:#fff;border-right:1px solid var(--gray-200);padding:1rem;overflow-y:auto;}
+    .main{flex:1;padding:1rem;background:var(--gray-50);overflow-y:auto;}
+    .details{width:400px;background:#fff;border-left:1px solid var(--gray-200);padding:1rem;overflow-y:auto;display:none;}
+    .task-item{background:#fff;padding:1rem;border-radius:.5rem;box-shadow:0 1px 3px rgba(0,0,0,.1);cursor:pointer;margin-bottom:.75rem;position:relative;}
+    .task-item:hover{background:var(--gray-100);}
+    .priority-high{background:var(--red-500);color:#fff;padding:.25rem .5rem;border-radius:.25rem;font-size:.75rem;}
+    .priority-mid{background:var(--yellow-400);color:#fff;padding:.25rem .5rem;border-radius:.25rem;font-size:.75rem;}
+    .priority-low{background:var(--green-500);color:#fff;padding:.25rem .5rem;border-radius:.25rem;font-size:.75rem;}
+    .chip{background:var(--gray-200);padding:.25rem .5rem;border-radius:1rem;margin-right:.5rem;margin-bottom:.5rem;display:inline-block;font-size:.75rem;}
+    .chip-remove{cursor:pointer;margin-left:.25rem;}
+    .section-header{font-size:.875rem;color:var(--gray-500);margin:1rem 0 .5rem;font-weight:600;}
+    .hidden{display:none;}
+    .flex{display:flex;}
+    .items-center{align-items:center;}
+    .space-x-2 > :not(:last-child){margin-right:.5rem;}
+    .space-x-4 > :not(:last-child){margin-right:1rem;}
+    .space-y-4 > :not(:last-child){margin-bottom:1rem;}
+    .space-y-2 > :not(:last-child){margin-bottom:.5rem;}
+    .border{border:1px solid var(--gray-300);}
+    .rounded{border-radius:.25rem;}
+    .rounded-lg{border-radius:.5rem;}
+    .p-2{padding:.5rem;}
+    .p-3{padding:.75rem;}
+    .text-sm{font-size:.875rem;}
+    .text-xs{font-size:.75rem;}
+    .font-bold{font-weight:bold;}
+    .font-semibold{font-weight:600;}
+    .hover\:bg-blue-600:hover{background:var(--blue-600);}
+    .bg-blue-500{background:var(--blue-500);}
+    .bg-green-500{background:var(--green-500);}
+    .text-white{color:#fff;}
+    .w-full{width:100%;}
+    .btn{padding:.5rem 1rem;border-radius:.25rem;font-size:.875rem;}
+    .btn-primary{background:var(--blue-500);color:#fff;}
+    .btn-success{background:var(--green-500);color:#fff;}
+    .add-task-btn{background:var(--green-500);color:#fff;font-weight:600;padding:.75rem 1rem;border-radius:.5rem;box-shadow:0 2px 4px rgba(0,0,0,.1);margin-bottom:1rem;}
+    .add-task-btn:hover{background:var(--green-600);}
+    .close-btn{color:var(--red-500);font-weight:bold;cursor:pointer;}
+    .input-group{margin-bottom:.75rem;}
+    .input-group label{display:block;font-size:.875rem;color:var(--gray-700);margin-bottom:.25rem;}
+    .input-group input,.input-group textarea,.input-group select{width:100%;padding:.5rem;border:1px solid var(--gray-300);border-radius:.25rem;}
+    .chip-input{display:flex;flex-wrap:wrap;gap:.25rem;padding:.5rem;border:1px solid var(--gray-300);border-radius:.25rem;min-height:38px;align-items:center;}
+    .chip-input input{border:none;outline:none;flex:1;min-width:120px;}
+    .view-header{font-size:1.25rem;font-weight:600;color:var(--gray-800);margin-bottom:1rem;}
+    .empty-state{text-align:center;padding:2rem;color:var(--gray-500);font-style:italic;}
+    .form-card{background:#fff;padding:1.5rem;border-radius:.5rem;box-shadow:0 1px 3px rgba(0,0,0,.1);}
+    .menu-item{padding:0.5rem 0.75rem;border-radius:0.25rem;cursor:pointer;}
+    .menu-item:hover{background:var(--gray-100);}
+    .menu-item.active{background:var(--blue-500);color:#fff;}
+    /* Context Menu */
+    .context-menu{
+        position:absolute;background:#fff;border:1px solid var(--gray-300);border-radius:.5rem;
+        box-shadow:0 4px 12px rgba(0,0,0,.15);z-index:1000;min-width:160px;
+        display:none;font-size:.875rem;
+    }
+    .context-menu-item{
+        padding:.5rem 1rem;cursor:pointer;display:flex;align-items:center;
+    }
+    .context-menu-item:hover{background:var(--gray-100);}
+    .context-menu-item.danger{color:var(--red-500);}
+    /* Comments */
+    .comment-thread{margin-top:1rem;}
+    .comment-item{border-top:1px solid var(--gray-200);padding:0.5rem 0;}
+    .comment-author{font-weight:600;}
+    .comment-date{color:var(--gray-500);font-size:0.75rem;}
+    /* Floating Add Button */
+    .floating-add-btn{position:fixed;bottom:2rem;right:2rem;background:var(--green-500);color:#fff;width:3rem;height:3rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,.2);}
+    .floating-add-btn:hover{background:var(--green-600);}
+</style>
+</head>
+<body>
+<div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2 class="text-lg font-bold mb-4">Views</h2>
+        <div id="menuList"></div>
+        <div class="menu-item" id="ownerView">My Tasks (Owner)</div>
+        <div class="mt-6">
+            <input type="text" id="newCategory" placeholder="New Category" class="p-2 border rounded w-full mb-2">
+            <button id="addCategoryBtn" class="p-2 bg-blue-500 text-white rounded w-full hover:bg-blue-600">Add Category</button>
+        </div>
+    </div>
+    <!-- Main -->
+    <div class="main">
+        <h1 class="text-2xl font-bold mb-4 text-gray-800">Data Center Project Management Tool</h1>
+        <div id="viewHeader" class="view-header"></div>
+        <div id="taskList"></div>
+        <!-- Add Task Form -->
+        <div id="addTaskForm" class="hidden form-card space-y-4">
+            <h2 class="text-lg font-bold">Create New Task</h2>
+            <div class="input-group"><label>Title</label><input type="text" id="taskTitle"></div>
+            <div class="input-group"><label>Description</label><textarea id="taskDesc" rows="3"></textarea></div>
+            <div class="flex space-x-4">
+                <div class="input-group flex-1"><label>Due Date</label><input type="date" id="taskDue"></div>
+                <div class="input-group flex-1"><label>Priority</label>
+                    <select id="taskPriority"><option value="low">Low</option><option value="mid">Mid</option><option value="high">High</option></select>
+                </div>
+            </div>
+            <div class="flex space-x-4">
+                <div class="input-group flex-1"><label>Category</label><select id="taskCategory"></select></div>
+                <div class="input-group flex-1"><label>Owner</label><input type="text" id="taskOwner" value="Josh Mayfield"></div>
+            </div>
+            <div class="input-group">
+                <label>Subscribers</label>
+                <div id="subscribersInput" class="chip-input"></div>
+            </div>
+            <div class="flex space-x-2">
+                <button type="button" id="submitTask" class="btn btn-primary flex-1">Create Task</button>
+                <button type="button" id="cancelTask" class="btn bg-gray-300 text-gray-700 flex-1">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <!-- Details Pane -->
+    <div class="details" id="detailsPane">
+        <div class="flex justify-between items-center mb-4">
+            <span id="taskIdDisplay" class="text-lg font-bold"></span>
+            <span id="priorityBadge" class="priority-high"></span>
+        </div>
+        <button id="closeDetails" class="close-btn mb-4">× Close</button>
+        <div id="detailsContent"></div>
+        <div class="section-header">Comments</div>
+        <div id="commentList" class="comment-thread"></div>
+        <div class="input-group mt-2">
+            <textarea id="newComment" rows="2" placeholder="Add a comment..."></textarea>
+        </div>
+        <button id="addCommentBtn" class="btn btn-primary w-full">Post Comment</button>
+    </div>
+    <!-- Context Menu -->
+    <div id="contextMenu" class="context-menu">
+        <div class="context-menu-item" data-action="open"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round:round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>Open</div>
+        <div class="context-menu-item" data-action="star"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>Star</div>
+        <div class="context-menu-item" data-action="duplicate"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>Duplicate</div>
+        <div class="context-menu-item danger" data-action="delete"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>Delete</div>
+    </div>
+    <!-- Floating Add Button -->
+    <div id="floatingAddBtn" class="floating-add-btn">+</div>
+</div>
 <script>
 /* ==================== DATA ==================== */
 const currentUser = 'Josh Mayfield';
@@ -45,20 +198,20 @@ function renderTask(task){
         <div class="font-semibold">${task.title}</div>
         <div class="text-sm text-gray-600">${task.category}</div>
         <div class="flex space-x-2 mt-2">
-            <span class="chip">${task.priority}</span>
+            <span class="chip priority-${task.priority}">${task.priority}</span>
             ${task.subscribers.map(s=>`<span class="chip">${s}<span class="chip-remove">×</span></span>`).join('')}
         </div>
     `;
     return div;
 }
-function renderTaskList(){
+function renderTaskList(filteredTasks = tasks){
     const container = document.getElementById('taskList');
     container.innerHTML = '';
-    if(tasks.length===0){
-        container.innerHTML = '<div class="empty-state">No tasks yet. Click “+ Add Task” to create one.</div>';
+    if(filteredTasks.length===0){
+        container.innerHTML = '<div class="empty-state">No tasks yet. Click “+” to create one.</div>';
         return;
     }
-    tasks.forEach(t=>container.appendChild(renderTask(t)));
+    filteredTasks.forEach(t=>container.appendChild(renderTask(t)));
 }
 
 /* ==================== MENU (CATEGORIES) ==================== */
@@ -76,25 +229,24 @@ function renderMenu(){
 function filterByCategory(cat){
     document.getElementById('viewHeader').textContent = cat;
     const filtered = tasks.filter(t=>t.category===cat);
-    const container = document.getElementById('taskList');
-    container.innerHTML = '';
-    if(filtered.length===0){
-        container.innerHTML = '<div class="empty-state">No tasks in this category.</div>';
-    }else{
-        filtered.forEach(t=>container.appendChild(renderTask(t)));
-    }
+    renderTaskList(filtered);
 }
 
+/* ==================== OWNER VIEW ==================== */
+document.getElementById('ownerView').addEventListener('click',()=>{
+    document.getElementById('viewHeader').textContent = 'My Tasks (Owner)';
+    const filtered = tasks.filter(t=>t.owner===currentUser);
+    renderTaskList(filtered);
+});
+
 /* ==================== ADD TASK FORM ==================== */
-document.getElementById('showAddForm').addEventListener('click',()=>{
+document.getElementById('floatingAddBtn').addEventListener('click',()=>{
     document.getElementById('addTaskForm').classList.remove('hidden');
-    document.getElementById('showAddForm').classList.add('hidden');
     populateCategorySelect();
 });
 
 document.getElementById('cancelTask').addEventListener('click',()=>{
     document.getElementById('addTaskForm').classList.add('hidden');
-    document.getElementById('showAddForm').classList.remove('hidden');
     clearAddTaskForm();
 });
 
@@ -129,13 +281,13 @@ document.getElementById('submitTask').addEventListener('click',()=>{
         category: document.getElementById('taskCategory').value,
         owner: document.getElementById('taskOwner').value,
         subscribers,
-        starred: false
+        starred: false,
+        comments: []  // New: Initialize comments array
     };
     tasks.push(newTask);
     persist();
     renderTaskList();
     document.getElementById('addTaskForm').classList.add('hidden');
-    document.getElementById('showAddForm').classList.remove('hidden');
     clearAddTaskForm();
 });
 
@@ -176,7 +328,7 @@ document.querySelectorAll('.context-menu-item').forEach(item=>{
             renderTaskList();
         }
         else if(action==='duplicate'){
-            const dup = {...currentContextTask, id:++taskCounter, title: currentContextTask.title+' (copy)'};
+            const dup = {...currentContextTask, id:++taskCounter, title: currentContextTask.title+' (copy)', comments: []};
             tasks.push(dup);
             persist();
             renderTaskList();
@@ -194,12 +346,14 @@ document.querySelectorAll('.context-menu-item').forEach(item=>{
 });
 
 /* ==================== DETAILS PANE ==================== */
+let currentOpenTask = null;
 function openDetails(task){
+    currentOpenTask = task;
     document.getElementById('detailsPane').style.display='block';
     document.getElementById('taskIdDisplay').textContent = `#${task.id} – ${task.title}`;
     const prio = document.getElementById('priorityBadge');
     prio.textContent = task.priority.toUpperCase();
-    prio.className = `priority-high ${task.priority==='high'?'bg-red-500':task.priority==='mid'?'bg-yellow-400':'bg-green-500'}`;
+    prio.className = `chip priority-${task.priority}`;
 
     document.getElementById('detailsContent').innerHTML = `
         <div class="section-header">Description</div>
@@ -215,11 +369,46 @@ function openDetails(task){
             <button class="btn bg-gray-300 text-gray-700">Save</button>
         </div>
     `;
+    renderComments(task.comments);
 }
 function closeDetails(){
     document.getElementById('detailsPane').style.display='none';
+    currentOpenTask = null;
 }
 document.getElementById('closeDetails').addEventListener('click',closeDetails);
+
+/* ==================== COMMENTS ==================== */
+function renderComments(comments){
+    const container = document.getElementById('commentList');
+    container.innerHTML = '';
+    if(comments.length === 0){
+        container.innerHTML = '<div class="empty-state">No comments yet.</div>';
+        return;
+    }
+    comments.forEach(comment => {
+        const div = document.createElement('div');
+        div.className = 'comment-item';
+        div.innerHTML = `
+            <div class="comment-author">${comment.author}</div>
+            <div class="comment-date">${comment.date}</div>
+            <p>${comment.text}</p>
+        `;
+        container.appendChild(div);
+    });
+}
+
+document.getElementById('addCommentBtn').addEventListener('click',()=>{
+    const text = document.getElementById('newComment').value.trim();
+    if(!text || !currentOpenTask) return;
+    currentOpenTask.comments.push({
+        author: currentUser,
+        date: new Date().toLocaleString(),
+        text
+    });
+    persist();
+    renderComments(currentOpenTask.comments);
+    document.getElementById('newComment').value = '';
+});
 
 /* ==================== INITIALISATION ==================== */
 document.addEventListener('DOMContentLoaded',()=>{
@@ -231,3 +420,5 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(categories.length) filterByCategory(categories[0]);
 });
 </script>
+</body>
+</html>
